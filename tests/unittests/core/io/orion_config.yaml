@@ -7,5 +7,5 @@ algorithms: 'random'
 
 database:
   type: 'mongodb'
-  name: 'orion_test'
+  name: 'kleio_test'
   host: 'mongodb://user:pass@localhost'

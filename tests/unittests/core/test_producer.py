@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""Collection of tests for :mod:`orion.core.worker.producer`."""
+"""Collection of tests for :mod:`kleio.core.worker.producer`."""
 import pytest
 
-from orion.core.worker.producer import Producer
+from kleio.core.worker.producer import Producer
 
 
 @pytest.fixture()

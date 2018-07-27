@@ -1,7 +1,7 @@
 Experiment Version Control
 ==========================
 
-.. automodule:: orion.core.evc
+.. automodule:: kleio.core.evc
    :members:
 
 .. toctree::

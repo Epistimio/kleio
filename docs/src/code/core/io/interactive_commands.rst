@@ -1,7 +1,7 @@
 Interactive commands
 ====================
 
-.. automodule:: orion.core.io.interactive_commands
+.. automodule:: kleio.core.io.interactive_commands
    :members:
    :show-inheritance:
 

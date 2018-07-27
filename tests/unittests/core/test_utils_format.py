@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""Example usage and tests for :mod:`orion.core.utils.format`."""
+"""Example usage and tests for :mod:`kleio.core.utils.format`."""
 
 import pytest
 
-from orion.core.utils.format_trials import (trial_to_tuple, tuple_to_trial)
-from orion.core.worker.trial import Trial
+from kleio.core.utils.format_trials import (trial_to_tuple, tuple_to_trial)
+from kleio.core.worker.trial import Trial
 
 
 @pytest.fixture()

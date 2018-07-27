@@ -8,5 +8,5 @@ Client helper functions
 
    client/manual
 
-.. automodule:: orion.client
+.. automodule:: kleio.client
    :members:

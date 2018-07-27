@@ -5,8 +5,8 @@ import numbers
 
 import pytest
 
-from orion.core.cli.insert import _validate_input_value
-from orion.core.io.space_builder import SpaceBuilder
+from kleio.core.cli.insert import _validate_input_value
+from kleio.core.io.space_builder import SpaceBuilder
 
 
 @pytest.fixture()

@@ -1,5 +1,5 @@
 Experiment Node
 ===============
 
-.. automodule:: orion.core.evc.experiment
+.. automodule:: kleio.core.evc.experiment
    :members:

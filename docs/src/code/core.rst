@@ -2,7 +2,7 @@
 Core of Oríon
 *************
 
-.. automodule:: orion.core
+.. automodule:: kleio.core
    :members:
 
 .. toctree::

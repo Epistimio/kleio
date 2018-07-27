@@ -1,5 +1,5 @@
 hunt command
 ============
 
-.. automodule:: orion.core.cli.hunt
+.. automodule:: kleio.core.cli.hunt
    :members:

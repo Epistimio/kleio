@@ -6,7 +6,7 @@ import os
 
 import pytest
 
-from orion.core.cli import hunt
+from kleio.core.cli import hunt
 
 
 def _create_parser(need_subparser=True):
@@ -25,7 +25,7 @@ def test_hunt_command_full_parsing(database, monkeypatch):
     monkeypatch.chdir(os.path.dirname(os.path.abspath(__file__)))
     parser, subparsers = _create_parser()
     args_list = ["hunt", "-n", "test",
-                 "--config", "./orion_config_random.yaml",
+                 "--config", "./kleio_config_random.yaml",
                  "--max-trials", "400", "--pool-size", "4",
                  "./black_box.py", "-x~normal(1,1)"]
 
@@ -34,7 +34,7 @@ def test_hunt_command_full_parsing(database, monkeypatch):
 
     args = vars(parser.parse_args(args_list))
     assert args['name'] == 'test'
-    assert args['config'].name == './orion_config_random.yaml'
+    assert args['config'].name == './kleio_config_random.yaml'
     assert args['user_args'] == ['./black_box.py', '-x~normal(1,1)']
     assert args['pool_size'] == 4
     assert args['max_trials'] == 400

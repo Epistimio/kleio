@@ -1,5 +1,5 @@
 Configuration converter
 =======================
 
-.. automodule:: orion.core.io.convert
+.. automodule:: kleio.core.io.convert
    :members:

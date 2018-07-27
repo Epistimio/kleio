@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""Example usage and tests for :mod:`orion.core.io.resolve_config`."""
+"""Example usage and tests for :mod:`kleio.core.io.resolve_config`."""
 
 import os
 import socket
 
 import pytest
 
-import orion.core.io.resolve_config as resolve_config
+import kleio.core.io.resolve_config as resolve_config
 
 
 @pytest.fixture
@@ -26,7 +26,7 @@ def test_fetch_default_options():
 
     assert default_config['algorithms'] == 'random'
     assert default_config['database']['host'] == socket.gethostbyname(socket.gethostname())
-    assert default_config['database']['name'] == 'orion'
+    assert default_config['database']['name'] == 'kleio'
     assert default_config['database']['type'] == 'MongoDB'
 
     assert default_config['max_trials'] == float('inf')
@@ -39,12 +39,12 @@ def test_fetch_env_vars():
     env_vars_config = resolve_config.fetch_env_vars()
     assert env_vars_config == {'database': {}}
 
-    db_name = "orion_test"
+    db_name = "kleio_test"
 
     os.environ['ORION_DB_NAME'] = db_name
 
     env_vars_config = resolve_config.fetch_env_vars()
-    assert env_vars_config == {'database': {'name': 'orion_test'}}
+    assert env_vars_config == {'database': {'name': 'kleio_test'}}
 
     db_type = "MongoDB"
     os.environ['ORION_DB_TYPE'] = db_type
@@ -54,10 +54,10 @@ def test_fetch_env_vars():
 
 
 @pytest.mark.usefixtures("version_XYZ")
-def test_fetch_metadata_orion_version():
-    """Verify orion version"""
+def test_fetch_metadata_kleio_version():
+    """Verify kleio version"""
     metadata = resolve_config.fetch_metadata({})
-    assert metadata['orion_version'] == 'XYZ'
+    assert metadata['kleio_version'] == 'XYZ'
 
 
 @pytest.mark.usefixtures("force_is_exe")
@@ -110,7 +110,7 @@ def test_fetch_config(config_file):
 
     assert config['algorithms'] == 'random'
     assert config['database']['host'] == 'mongodb://user:pass@localhost'
-    assert config['database']['name'] == 'orion_test'
+    assert config['database']['name'] == 'kleio_test'
     assert config['database']['type'] == 'mongodb'
 
     assert config['max_trials'] == 100

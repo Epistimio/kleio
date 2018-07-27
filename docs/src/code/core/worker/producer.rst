@@ -3,5 +3,5 @@ Producer
 
 TODO
 
-.. automodule:: orion.core.worker.producer
+.. automodule:: kleio.core.worker.producer
    :members:

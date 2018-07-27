@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""Collection of tests for :mod:`orion.core.evc.cli`."""
+"""Collection of tests for :mod:`kleio.core.evc.cli`."""
 import argparse
 
 import pytest
 
-from orion.core.cli.evc import get_branching_args_group
-from orion.core.evc.conflicts import Resolution
+from kleio.core.cli.evc import get_branching_args_group
+from kleio.core.evc.conflicts import Resolution
 
 
 def test_defined_parser():

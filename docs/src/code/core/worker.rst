@@ -1,7 +1,7 @@
 Worker and its components
 =========================
 
-.. automodule:: orion.core.worker
+.. automodule:: kleio.core.worker
    :members:
 
 .. toctree::

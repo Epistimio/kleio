@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""Collection of tests for :mod:`orion.core.worker.trial`."""
+"""Collection of tests for :mod:`kleio.core.worker.trial`."""
 
 import pytest
 
-from orion.core.worker.trial import Trial
+from kleio.core.worker.trial import Trial
 
 
 class TestTrial(object):

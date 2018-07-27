@@ -8,11 +8,11 @@ import os
 
 import pytest
 
-from orion.algo.space import (Categorical, Integer, Real, Space)
-from orion.core.evc import conflicts
-from orion.core.io.convert import (JSONConverter, YAMLConverter)
-from orion.core.io.space_builder import DimensionBuilder
-from orion.core.worker.experiment import Experiment
+from kleio.algo.space import (Categorical, Integer, Real, Space)
+from kleio.core.evc import conflicts
+from kleio.core.io.convert import (JSONConverter, YAMLConverter)
+from kleio.core.io.space_builder import DimensionBuilder
+from kleio.core.worker.experiment import Experiment
 
 
 TEST_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -156,7 +156,7 @@ def refers_id_substitution(with_user_tsirif, random_dt, clean_db, create_db_inst
 
 ###
 # Fixtures for EVC tests using conflicts, present in both ./evc and ./io.
-# Note: Refactoring the EVC out of orion's core should take care of getting those
+# Note: Refactoring the EVC out of kleio's core should take care of getting those
 #       fixtures out of general conftest.py
 ###
 

@@ -1,5 +1,5 @@
 MongoDB database
 ================
 
-.. automodule:: orion.core.io.database.mongodb
+.. automodule:: kleio.core.io.database.mongodb
    :members:

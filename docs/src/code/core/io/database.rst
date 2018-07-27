@@ -7,7 +7,7 @@ Databases
 
    database/mongodb
 
-.. automodule:: orion.core.io.database
+.. automodule:: kleio.core.io.database
    :members:
    :show-inheritance:
 

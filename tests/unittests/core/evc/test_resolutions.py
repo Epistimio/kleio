@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""Collection of tests resolutions in :mod:`orion.core.evc.conflicts`."""
+"""Collection of tests resolutions in :mod:`kleio.core.evc.conflicts`."""
 
 import pytest
 
-from orion.algo.space import Dimension
-from orion.core.evc import adapters
-from orion.core.evc import conflicts
+from kleio.algo.space import Dimension
+from kleio.core.evc import adapters
+from kleio.core.evc import conflicts
 
 
 @pytest.fixture

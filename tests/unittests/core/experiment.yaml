@@ -1,21 +1,21 @@
-# Example `orion` database, first are the "primary keys" (there's also an
+# Example `kleio` database, first are the "primary keys" (there's also an
 # implicit _id key here in MongoDB, but we cannot base our search based on that)
 ---
 
 # Example of entries in `experiments` collection
 # configurations: some are inferred automatically,
-# but most depend on user's input to `orion`
+# but most depend on user's input to `kleio`
 - name: supernaedo2
 
   metadata:
     # inferred from os
     user: tsirif
     datetime: 2017-11-22T20:00:00
-    # from orion.__version__
-    orion_version: XYZ
-    # from `orion`'s args
+    # from kleio.__version__
+    kleio_version: XYZ
+    # from `kleio`'s args
     user_script: full_path/main.py
-    # from `orion`'s args
+    # from `kleio`'s args
     user_args: ["--encoding_layer~choices(['rnn', 'lstm', 'gru'])", "--decoding_layer~choices(['rnn', 'lstm_with_attention', 'gru'])"]
     # from user's vsc, e.g. git
     user_vcs: git
@@ -30,7 +30,7 @@
     parent_id: null
     adapter: []
 
-  # orion's configuration
+  # kleio's configuration
   pool_size: 2
   max_trials: 1000
 
@@ -49,7 +49,7 @@
   metadata:
     user: tsirif
     datetime: 2017-11-22T21:00:00
-    orion_version: XYZ
+    kleio_version: XYZ
     user_script: full_path/ieeeela.py
     user_args: ["--encoding_layer~choices(['rnn', 'lstm', 'gru'])", "--decoding_layer~choices(['rnn', 'lstm_with_attention', 'gru'])"]
     user_vcs: git
@@ -74,7 +74,7 @@
   metadata:
     user: tsirif
     datetime: 2017-11-22T21:00:00
-    orion_version: XYZ
+    kleio_version: XYZ
     user_script: full_path/ieeeela.py
     user_args: ["--encoding_layer~choices(['rnn', 'lstm', 'gru'])", "--decoding_layer~choices(['rnn', 'lstm_with_attention', 'gru'])"]
     user_vcs: git
@@ -100,7 +100,7 @@
   metadata:
     user: dendi
     datetime: 2017-11-22T20:00:00
-    orion_version: XYZ
+    kleio_version: XYZ
     user_script: full_path/main.py
     user_args: ["--encoding_layer~choices(['rnn', 'lstm', 'gru'])", "--decoding_layer~choices(['rnn', 'lstm_with_attention', 'gru'])"]
     user_vcs: git
@@ -127,11 +127,11 @@
     # inferred from os
     user: tsirif
     datetime: 2017-11-22T20:00:00
-    # from orion.__version__
-    orion_version: 0.1
-    # from `orion`'s args
+    # from kleio.__version__
+    kleio_version: 0.1
+    # from `kleio`'s args
     user_script: full_path/main.py
-    # from `orion`'s args
+    # from `kleio`'s args
     user_args: ["--encoding_layer~choices(['rnn', 'lstm', 'gru'])"]
     # from user's vsc, e.g. git
     user_vcs: git
@@ -148,7 +148,7 @@
           type: categorical
           value: gru
 
-  # orion's configuration
+  # kleio's configuration
   pool_size: 2
   max_trials: 1000
 
@@ -166,11 +166,11 @@
     # inferred from os
     user: tsirif
     datetime: 2017-11-22T20:00:00
-    # from orion.__version__
-    orion_version: 0.1
-    # from `orion`'s args
+    # from kleio.__version__
+    kleio_version: 0.1
+    # from `kleio`'s args
     user_script: full_path/main.py
-    # from `orion`'s args
+    # from `kleio`'s args
     user_args: ["--encoding_layer~choices(['rnn', 'lstm', 'gru'])"]
     # from user's vsc, e.g. git
     user_vcs: git
@@ -187,7 +187,7 @@
           type: categorical
           value: lstm_with_attention
 
-  # orion's configuration
+  # kleio's configuration
   pool_size: 2
   max_trials: 1000
 
@@ -205,11 +205,11 @@
     # inferred from os
     user: tsirif
     datetime: 2017-11-22T20:00:00
-    # from orion.__version__
-    orion_version: 0.1
-    # from `orion`'s args
+    # from kleio.__version__
+    kleio_version: 0.1
+    # from `kleio`'s args
     user_script: full_path/main.py
-    # from `orion`'s args
+    # from `kleio`'s args
     user_args: ["--encoding~choices(['rnn', 'lstm', 'gru'])", "--decoding_layer~choices(['rnn', 'lstm_with_attention', 'gru'])"]
     # from user's vsc, e.g. git
     user_vcs: git
@@ -224,7 +224,7 @@
         old_name: /encoding_layer
         new_name: /encoding
 
-  # orion's configuration
+  # kleio's configuration
   pool_size: 2
   max_trials: 1000
 
@@ -242,11 +242,11 @@
     # inferred from os
     user: tsirif
     datetime: 2017-11-22T20:00:00
-    # from orion.__version__
-    orion_version: 0.1
-    # from `orion`'s args
+    # from kleio.__version__
+    kleio_version: 0.1
+    # from `kleio`'s args
     user_script: full_path/main.py
-    # from `orion`'s args
+    # from `kleio`'s args
     user_args: ["--encoding~choices(['rnn', 'lstm_with_attention', 'gru'])"]
     # from user's vsc, e.g. git
     user_vcs: git
@@ -267,7 +267,7 @@
         old_prior: "choices(['rnn', 'lstm', 'gru'])"
         new_prior: "choices(['rnn', 'lstm_with_attention', 'gru'])"
 
-  # orion's configuration
+  # kleio's configuration
   pool_size: 2
   max_trials: 1000
 
@@ -285,11 +285,11 @@
     # inferred from os
     user: tsirif
     datetime: 2017-11-22T20:00:00
-    # from orion.__version__
-    orion_version: 0.1
-    # from `orion`'s args
+    # from kleio.__version__
+    kleio_version: 0.1
+    # from `kleio`'s args
     user_script: full_path/main.py
-    # from `orion`'s args
+    # from `kleio`'s args
     user_args: ["--encoding~choices(['rnn', 'lstm_with_attention', 'gru'])"]
     # from user's vsc, e.g. git
     user_vcs: git
@@ -303,7 +303,7 @@
       - of_type: codechange
         change_type: noeffect
 
-  # orion's configuration
+  # kleio's configuration
   pool_size: 2
   max_trials: 1000
 
@@ -321,11 +321,11 @@
     # inferred from os
     user: tsirif
     datetime: 2017-11-22T20:00:00
-    # from orion.__version__
-    orion_version: 0.1
-    # from `orion`'s args
+    # from kleio.__version__
+    kleio_version: 0.1
+    # from `kleio`'s args
     user_script: full_path/main.py
-    # from `orion`'s args
+    # from `kleio`'s args
     user_args: ["--encoding~choices(['rnn', 'lstm_with_attention', 'gru'])"]
     # from user's vsc, e.g. git
     user_vcs: git
@@ -339,7 +339,7 @@
       - of_type: codechange
         change_type: unsure
 
-  # orion's configuration
+  # kleio's configuration
   pool_size: 2
   max_trials: 1000
 
@@ -357,11 +357,11 @@
     # inferred from os
     user: tsirif
     datetime: 2017-11-22T20:00:00
-    # from orion.__version__
-    orion_version: 0.1
-    # from `orion`'s args
+    # from kleio.__version__
+    kleio_version: 0.1
+    # from `kleio`'s args
     user_script: full_path/main.py
-    # from `orion`'s args
+    # from `kleio`'s args
     user_args: ["--encoding~choices(['rnn', 'lstm_with_attention', 'gru'])"]
     # from user's vsc, e.g. git
     user_vcs: git
@@ -375,7 +375,7 @@
       - of_type: codechange
         change_type: break
 
-  # orion's configuration
+  # kleio's configuration
   pool_size: 2
   max_trials: 1000
 
@@ -393,11 +393,11 @@
     # inferred from os
     user: tsirif
     datetime: 2017-11-22T20:00:00
-    # from orion.__version__
-    orion_version: 0.1
-    # from `orion`'s args
+    # from kleio.__version__
+    kleio_version: 0.1
+    # from `kleio`'s args
     user_script: full_path/main.py
-    # from `orion`'s args
+    # from `kleio`'s args
     user_args: ["--encoding_layer~choices(['rnn', 'lstm', 'gru'])"]
     # from user's vsc, e.g. git
     user_vcs: git
@@ -410,7 +410,7 @@
     adapter:
       - of_type: algorithmchange
 
-  # orion's configuration
+  # kleio's configuration
   pool_size: 2
   max_trials: 1000
 

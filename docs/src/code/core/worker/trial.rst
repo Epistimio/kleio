@@ -1,6 +1,6 @@
 Trial
 =====
 
-.. automodule:: orion.core.worker.trial
+.. automodule:: kleio.core.worker.trial
    :members:
    :special-members:

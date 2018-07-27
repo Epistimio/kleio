@@ -35,7 +35,7 @@ sys.path.insert(0, docs_src_path)
 src_path = os.path.abspath(os.path.join(docs_src_path, '..', '..', 'src'))
 sys.path.insert(0, src_path)
 
-import orion.core as orion  # noqa
+import kleio.core as kleio  # noqa
 
 # -- General configuration ------------------------------------------------
 
@@ -58,10 +58,10 @@ extensions = [
 ]
 
 # General information about the project.
-project = u'orion'
-_full_version = orion.__version__
-author = orion.__author__
-copyright = orion.__copyright__
+project = u'kleio'
+_full_version = kleio.__version__
+author = kleio.__author__
+copyright = kleio.__copyright__
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -155,7 +155,7 @@ html_sidebars = {
 # -- Options for HTMLHelp output ------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'oriondoc'
+htmlhelp_basename = 'kleiodoc'
 
 
 # -- Options for LaTeX output ---------------------------------------------
@@ -182,7 +182,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'orion.tex', u'Oríon Documentation',
+    (master_doc, 'kleio.tex', u'Oríon Documentation',
      u'Oríon Team - MILA, Université de Montréal', 'manual'),
 ]
 
@@ -192,7 +192,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'orion', 'Oríon Documentation',
+    (master_doc, 'kleio', 'Oríon Documentation',
      [author], 1)
 ]
 
@@ -204,7 +204,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
     (master_doc, 'Oríon', 'Oríon Documentation',
-     author, 'orion', orion.__descr__,
+     author, 'kleio', kleio.__descr__,
      'Miscellaneous'),
 ]
 

@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""Example usage and tests for :mod:`orion.client`."""
+"""Example usage and tests for :mod:`kleio.client`."""
 
 from importlib import reload
 import json
 
 import pytest
 
-from orion import client
+from kleio import client
 
 
 @pytest.fixture()

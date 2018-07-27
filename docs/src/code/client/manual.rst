@@ -1,5 +1,5 @@
 Helper function to insert new trials
 ====================================
 
-.. automodule:: orion.client.manual
+.. automodule:: kleio.client.manual
    :members:

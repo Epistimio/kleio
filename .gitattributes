@@ -1,1 +1,1 @@
-src/orion/core/_version.py export-subst
+src/kleio/core/_version.py export-subst

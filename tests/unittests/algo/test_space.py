@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""Example usage and tests for :mod:`orion.algo.space`."""
+"""Example usage and tests for :mod:`kleio.algo.space`."""
 
 from collections import (defaultdict, OrderedDict)
 
@@ -9,7 +9,7 @@ from numpy.testing import assert_array_equal as assert_eq
 import pytest
 from scipy.stats import distributions as dists
 
-from orion.algo.space import (Categorical, Dimension, Integer, Real, Space)
+from kleio.algo.space import (Categorical, Dimension, Integer, Real, Space)
 
 
 class TestDimension(object):

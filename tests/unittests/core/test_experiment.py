@@ -1,16 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""Collection of tests for :mod:`orion.core.worker.experiment`."""
+"""Collection of tests for :mod:`kleio.core.worker.experiment`."""
 
 import copy
 import random
 
 import pytest
 
-from orion.algo.base import BaseAlgorithm
-from orion.core.io.database import Database, DuplicateKeyError
-from orion.core.worker.experiment import Experiment, ExperimentView
-from orion.core.worker.trial import Trial
+from kleio.algo.base import BaseAlgorithm
+from kleio.core.io.database import Database, DuplicateKeyError
+from kleio.core.worker.experiment import Experiment, ExperimentView
+from kleio.core.worker.trial import Trial
 
 
 @pytest.fixture()
@@ -67,7 +67,7 @@ def patch_sample_concurrent(monkeypatch, create_db_instance, exp_config):
 
         if len(a_list) > 3:
             # Set row's status as 'reserved' just like if it was reserved by
-            # another process right after the call to orion_db.read()
+            # another process right after the call to kleio_db.read()
             create_db_instance.write(
                 "trials",
                 data={"status": "reserved"},
@@ -99,7 +99,7 @@ def patch_sample_concurrent2(monkeypatch, create_db_instance, exp_config):
         assert should_be_one == 1
 
         # Set row's status as 'reserved' just like if it was reserved by
-        # another process right after the call to orion_db.read()
+        # another process right after the call to kleio_db.read()
         create_db_instance.write(
             "trials",
             data={"status": "reserved"},
@@ -119,7 +119,7 @@ def new_config(random_dt):
         name='supernaekei',
         # refers is missing on purpose
         metadata={'user': 'tsirif',
-                  'orion_version': 0.1,
+                  'kleio_version': 0.1,
                   'user_script': 'abs_path/to_yoyoy.py',
                   'user_config': 'abs_path/hereitis.yaml',
                   'user_args': ['--mini-batch~uniform(32, 256, discrete=True)'],
@@ -212,7 +212,7 @@ class TestConfigProperty(object):
 
         Before initialization is done, it can be the case that the pair (`name`,
         user's name) has not hit the database. return a yaml compliant form
-        of current state, to be used with :mod:`orion.core.io.resolve_config`.
+        of current state, to be used with :mod:`kleio.core.io.resolve_config`.
         """
         exp = Experiment('supernaekei')
         cfg = exp.configuration
@@ -336,7 +336,7 @@ class TestConfigProperty(object):
 
         Before initialization is done, it can be the case that the pair (`name`,
         user's name) has not hit the database. return a yaml compliant form
-        of current state, to be used with :mod:`orion.core.cli.esolve_config`.
+        of current state, to be used with :mod:`kleio.core.cli.esolve_config`.
         """
         exp = Experiment('supernaedo2')
         # Deliver an external configuration to finalize init
@@ -505,7 +505,7 @@ class TestReserveTrial(object):
     def test_reserve_none(self):
         """Find nothing, return None."""
         try:
-            Database(of_type='MongoDB', name='orion_test',
+            Database(of_type='MongoDB', name='kleio_test',
                      username='user', password='pass')
         except (TypeError, ValueError):
             pass

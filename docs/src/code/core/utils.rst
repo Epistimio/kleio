@@ -7,5 +7,5 @@ Utilities
 
    utils/format_trials
 
-.. automodule:: orion.core.utils
+.. automodule:: kleio.core.utils
    :members:

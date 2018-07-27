@@ -1,7 +1,7 @@
 Input/Output
 ============
 
-.. automodule:: orion.core.io
+.. automodule:: kleio.core.io
    :members:
    :show-inheritance:
 

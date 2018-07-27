@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""Example usage and tests for :mod:`orion.core.io.space_builder`."""
+"""Example usage and tests for :mod:`kleio.core.io.space_builder`."""
 import copy
 
 import pytest
 from scipy.stats import distributions as dists
 
-from orion.algo.space import (Categorical, Integer, Real)
-from orion.core.io.space_builder import (DimensionBuilder, SpaceBuilder)
-from orion.core.worker.trial import Trial
+from kleio.algo.space import (Categorical, Integer, Real)
+from kleio.core.io.space_builder import (DimensionBuilder, SpaceBuilder)
+from kleio.core.worker.trial import Trial
 
 
 @pytest.fixture(scope='module')

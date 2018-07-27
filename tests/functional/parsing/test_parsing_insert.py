@@ -6,7 +6,7 @@ import os
 
 import pytest
 
-from orion.core.cli import insert
+from kleio.core.cli import insert
 
 
 def _create_parser(need_subparser=True):
@@ -25,12 +25,12 @@ def test_insert_command_full_parsing(database, monkeypatch):
     monkeypatch.chdir(os.path.dirname(os.path.abspath(__file__)))
     parser, subparsers = _create_parser()
     args_list = ["insert", "-n", "test", "--config",
-                 "./orion_config_random.yaml", "./black_box.py", "-x=1"]
+                 "./kleio_config_random.yaml", "./black_box.py", "-x=1"]
 
     insert.add_subparser(subparsers)
     subparsers.choices['insert'].set_defaults(func='')
 
     args = vars(parser.parse_args(args_list))
     assert args['name'] == 'test'
-    assert args['config'].name == './orion_config_random.yaml'
+    assert args['config'].name == './kleio_config_random.yaml'
     assert args['user_args'] == ['./black_box.py', '-x=1']

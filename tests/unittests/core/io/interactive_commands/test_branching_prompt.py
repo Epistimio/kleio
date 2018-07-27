@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""Collection of tests for :mod:`orion.core.io.interactive_commands.branching_prompt`."""
+"""Collection of tests for :mod:`kleio.core.io.interactive_commands.branching_prompt`."""
 import shlex
 
 import pytest
 
-from orion.core import evc
-from orion.core.io.experiment_branch_builder import ExperimentBranchBuilder
-from orion.core.io.interactive_commands.branching_prompt import BranchingPrompt
-from orion.core.io.space_builder import DimensionBuilder
+from kleio.core import evc
+from kleio.core.io.experiment_branch_builder import ExperimentBranchBuilder
+from kleio.core.io.interactive_commands.branching_prompt import BranchingPrompt
+from kleio.core.io.space_builder import DimensionBuilder
 
 
 @pytest.fixture

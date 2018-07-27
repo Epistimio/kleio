@@ -1,5 +1,5 @@
 Random Search Algorithm
 =======================
 
-.. automodule:: orion.algo.random
+.. automodule:: kleio.algo.random
    :members:

@@ -33,7 +33,7 @@ Last line of the main() function
 
 .. code-block:: bash
 
-    orion -v hunt -n resnet18-cifar10 python main.py --lr~'loguniform(1e-5, 1.0)'
+    kleio -v hunt -n resnet18-cifar10 python main.py --lr~'loguniform(1e-5, 1.0)'
 
 .. note ::
 
@@ -50,4 +50,4 @@ Last line of the main() function
         sed -i 's/from /from ./g' models/__init__.py
 
 
-.. # orion submit -n resnet18-cifar10 mysubmissionfile
+.. # kleio submit -n resnet18-cifar10 mysubmissionfile

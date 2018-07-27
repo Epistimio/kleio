@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""Example usage and tests for :mod:`orion.core.io.converter`."""
+"""Example usage and tests for :mod:`kleio.core.io.converter`."""
 import os
 
 import pytest
 
-from orion.core.io.convert import (GenericConverter, infer_converter_from_file_type,
+from kleio.core.io.convert import (GenericConverter, infer_converter_from_file_type,
                                    JSONConverter, YAMLConverter)
 
 

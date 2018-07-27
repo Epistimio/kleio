@@ -4,7 +4,7 @@
 
 import argparse
 
-from orion.client import report_results
+from kleio.client import report_results
 
 
 def function(x):

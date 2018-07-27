@@ -1,5 +1,5 @@
 Space search
 ============
 
-.. automodule:: orion.algo.space
+.. automodule:: kleio.algo.space
    :members:

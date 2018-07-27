@@ -1,5 +1,5 @@
 insert command
 ==============
 
-.. automodule:: orion.core.cli.insert
+.. automodule:: kleio.core.cli.insert
    :members:

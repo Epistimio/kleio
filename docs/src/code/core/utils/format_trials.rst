@@ -1,5 +1,5 @@
 Format trials
 =============
 
-.. automodule:: orion.core.utils.format_trials
+.. automodule:: kleio.core.utils.format_trials
    :members:

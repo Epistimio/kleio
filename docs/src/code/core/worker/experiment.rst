@@ -1,5 +1,5 @@
 Experiment
 ==========
 
-.. automodule:: orion.core.worker.experiment
+.. automodule:: kleio.core.worker.experiment
    :members:

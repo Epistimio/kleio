@@ -3,5 +3,5 @@ Consumer
 
 TODO
 
-.. automodule:: orion.core.worker.consumer
+.. automodule:: kleio.core.worker.consumer
    :members:

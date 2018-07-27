@@ -1,5 +1,5 @@
 Dimension transformations
 =========================
 
-.. automodule:: orion.core.worker.transformer
+.. automodule:: kleio.core.worker.transformer
    :members:

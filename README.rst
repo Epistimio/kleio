@@ -1,14 +1,14 @@
-*****
-Oríon
-*****
+******
+Kleiṓ
+******
 
-.. image:: https://travis-ci.org/mila-udem/orion.svg?branch=master
-   :target: https://travis-ci.org/mila-udem/orion
+.. image:: https://travis-ci.org/mila-udem/kleio.svg?branch=master
+   :target: https://travis-ci.org/mila-udem/kleio
 
-.. image:: https://codecov.io/gh/mila-udem/orion/branch/master/graphs/badge.svg?branch=master
-   :target: https://codecov.io/gh/mila-udem/orion
+.. image:: https://codecov.io/gh/mila-udem/kleio/branch/master/graphs/badge.svg?branch=master
+   :target: https://codecov.io/gh/mila-udem/kleio
 
-Oríon is an asynchronous framework for black-box function optimization.
+Kleiṓ is an asynchronous framework for black-box function optimization.
 
 Its purpose is to serve as a meta-optimizer for machine learning models
 and training, as well as a flexible experimentation
@@ -21,11 +21,11 @@ It allows fast and efficient tuning, providing minimum simple non-intrusive
 So if ``./run.py --mini-batch=50`` looks like what you execute normally,
 now what you have to do looks like this:
 
-``orion -n experiment_name ./run.py --mini-batch~'randint(32, 256)'``
+``kleio -n experiment_name ./run.py --mini-batch~'randint(32, 256)'``
 
 Check out `user's guide-101`_ for the simplest of demonstrations!
 
-.. _user's guide-101: https://orion.readthedocs.io/en/latest/user/executing.html
+.. _user's guide-101: https://kleio.readthedocs.io/en/latest/user/executing.html
 
 Features
 ========
@@ -51,18 +51,18 @@ Features
 
 .. _MongoDB: https://www.mongodb.com/
 .. _Skopt: https://scikit-optimize.github.io/
-.. _developer's guide-101: https://orion.readthedocs.io/en/latest/developer/testing.html
+.. _developer's guide-101: https://kleio.readthedocs.io/en/latest/developer/testing.html
 
 Installation
 ============
 
-Install Oríon (beta) by running:
+Install Kleiṓ (beta) by running:
 
-``pip install git+https://github.com/mila-udem/orion.git@master``
+``pip install git+https://github.com/mila-udem/kleio.git@master``
 
 For more information read the `full installation docs`_.
 
-.. _full installation docs: https://orion.readthedocs.io/en/latest/installing.html
+.. _full installation docs: https://kleio.readthedocs.io/en/latest/installing.html
 
 Contribute or Ask
 =================
@@ -71,8 +71,8 @@ Do you have a question or issues?
 Do you want to report a bug or suggest a feature? Name it!
 Please contact us by opening an issue in our repository below:
 
-- Issue Tracker: `<github.com/mila-udem/orion/issues>`_
-- Source Code: `<github.com/mila-udem/orion>`_
+- Issue Tracker: `<github.com/mila-udem/kleio/issues>`_
+- Source Code: `<github.com/mila-udem/kleio>`_
 
 Start by starring and forking our Github repo!
 

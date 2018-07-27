@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""Example usage and tests for :mod:`orion.core.io.experiment_builder`."""
+"""Example usage and tests for :mod:`kleio.core.io.experiment_builder`."""
 
 import pytest
 
-from orion.core.io import resolve_config
-from orion.core.io.experiment_builder import ExperimentBuilder
+from kleio.core.io import resolve_config
+from kleio.core.io.experiment_builder import ExperimentBuilder
 
 
 @pytest.mark.usefixtures("clean_db")
@@ -16,7 +16,7 @@ def test_fetch_local_config(config_file):
 
     assert local_config['algorithms'] == 'random'
     assert local_config['database']['host'] == 'mongodb://user:pass@localhost'
-    assert local_config['database']['name'] == 'orion_test'
+    assert local_config['database']['name'] == 'kleio_test'
     assert local_config['database']['type'] == 'mongodb'
     assert local_config['max_trials'] == 100
     assert local_config['name'] == 'voila_voici'
@@ -36,7 +36,7 @@ def test_fetch_local_config_from_incomplete_config(incomplete_config_file):
 
     assert local_config['algorithms'] == 'random'
     assert local_config['database']['host'] == 'mongodb://user:pass@localhost'
-    assert local_config['database']['name'] == 'orion'
+    assert local_config['database']['name'] == 'kleio'
     assert local_config['database']['type'] == 'incomplete'
     assert local_config['max_trials'] == float('inf')
     assert local_config['name'] == 'incomplete'
@@ -76,7 +76,7 @@ def test_fetch_full_config_new_config(config_file, exp_config, random_dt):
     full_config = ExperimentBuilder().fetch_full_config(cmdargs)
     cmdconfig = ExperimentBuilder().fetch_file_config(cmdargs)
 
-    full_config['metadata']['orion_version'] = exp_config[0][0]['metadata']['orion_version']
+    full_config['metadata']['kleio_version'] = exp_config[0][0]['metadata']['kleio_version']
 
     assert full_config['name'] == exp_config[0][0]['name']
     assert full_config['refers'] == exp_config[0][0]['refers']
@@ -98,7 +98,7 @@ def test_fetch_full_config_old_config(old_config_file, exp_config, random_dt):
     full_config = ExperimentBuilder().fetch_full_config(cmdargs)
     cmdconfig = ExperimentBuilder().fetch_file_config(cmdargs)
 
-    full_config['metadata']['orion_version'] = exp_config[0][0]['metadata']['orion_version']
+    full_config['metadata']['kleio_version'] = exp_config[0][0]['metadata']['kleio_version']
 
     assert full_config['name'] == exp_config[0][0]['name']
     assert full_config['refers'] == exp_config[0][0]['refers']

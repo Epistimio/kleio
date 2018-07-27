@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""Example usage and tests for :mod:`orion.core.worker.primary_algo`."""
+"""Example usage and tests for :mod:`kleio.core.worker.primary_algo`."""
 
 import pytest
 
-from orion.core.worker.primary_algo import PrimaryAlgo
+from kleio.core.worker.primary_algo import PrimaryAlgo
 
 
 @pytest.fixture()

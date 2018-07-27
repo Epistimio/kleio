@@ -21,7 +21,7 @@ User's recommended
 
 .. code-block:: sh
 
-   pip install git+https://github.com/mila-udem/orion.git@master
+   pip install git+https://github.com/mila-udem/kleio.git@master
 
 Begin reading instructions for using it in :doc:`/user/executing`.
 
@@ -37,15 +37,15 @@ also recommended, but not necessary. Example:
 .. code-block:: sh
 
    <Create and navigate to the directory where local repo will reside>
-   git clone https://github.com/mila-udem/orion.git
-   mkvirtualenv -a $PWD/orion orion
-   workon orion
+   git clone https://github.com/mila-udem/kleio.git
+   mkvirtualenv -a $PWD/kleio kleio
+   workon kleio
    python setup.py develop --optimize=1
    <Do your job>
    deactivate
 
 Begin reading instructions for developing it in :doc:`/developer/testing`.
 
-.. _repository: https://github.com/mila-udem/orion
+.. _repository: https://github.com/mila-udem/kleio
 .. _virtual environment: https://virtualenvwrapper.readthedocs.io/en/latest/command_ref.html#mkvirtualenv
 .. _development mode: https://setuptools.readthedocs.io/en/latest/setuptools.html#development-mode

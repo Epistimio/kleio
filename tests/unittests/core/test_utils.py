@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""Test base functionalities of :mod:`orion.core.utils`."""
+"""Test base functionalities of :mod:`kleio.core.utils`."""
 
 import pytest
 
-from orion.core.utils import Factory
+from kleio.core.utils import Factory
 
 
 def test_factory_subclasses_detection():

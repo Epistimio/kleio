@@ -4,7 +4,7 @@ Algorithm modules
 
 TODO
 
-.. automodule:: orion.algo
+.. automodule:: kleio.algo
    :members:
 
 .. toctree::

@@ -1,6 +1,6 @@
-"""Test for generic :class:`orion.core.evc.tree`"""
+"""Test for generic :class:`kleio.core.evc.tree`"""
 
-from orion.core.evc.tree import DepthFirstTraversal, flattened, PreOrderTraversal, TreeNode
+from kleio.core.evc.tree import DepthFirstTraversal, flattened, PreOrderTraversal, TreeNode
 
 
 def test_node_creation():

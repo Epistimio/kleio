@@ -1,5 +1,5 @@
 init-only command
 =================
 
-.. automodule:: orion.core.cli.init_only
+.. automodule:: kleio.core.cli.init_only
    :members:

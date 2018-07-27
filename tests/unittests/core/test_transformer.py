@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""Collection of tests for :mod:`orion.core.worker.transformer`."""
+"""Collection of tests for :mod:`kleio.core.worker.transformer`."""
 from collections import OrderedDict
 import copy
 
 import numpy
 import pytest
 
-from orion.algo.space import (Categorical, Dimension, Integer, Real, Space,)
-from orion.core.worker.transformer import (build_required_space,
+from kleio.algo.space import (Categorical, Dimension, Integer, Real, Space,)
+from kleio.core.worker.transformer import (build_required_space,
                                            Compose, Enumerate, Identity,
                                            OneHotEncode, Quantize, Reverse,
                                            TransformedDimension, TransformedSpace,)

@@ -1,15 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""Collection of tests for :mod:`orion.core.evc.adapters`."""
+"""Collection of tests for :mod:`kleio.core.evc.adapters`."""
 
 import pytest
 
-from orion.algo.space import Real
-from orion.core.evc.adapters import (
+from kleio.algo.space import Real
+from kleio.core.evc.adapters import (
     Adapter, AlgorithmChange, CodeChange, CompositeAdapter, DimensionAddition, DimensionDeletion,
     DimensionPriorChange, DimensionRenaming)
-from orion.core.io.space_builder import DimensionBuilder
-from orion.core.worker.trial import Trial
+from kleio.core.io.space_builder import DimensionBuilder
+from kleio.core.worker.trial import Trial
 
 
 @pytest.fixture
@@ -82,10 +82,10 @@ def trials(small_prior, large_prior, normal_prior, disjoint_prior,
 
 
 class TestDimensionAdditionInit(object):
-    """Test initialization of :class:`orion.core.evc.adapters.DimensionAddition`"""
+    """Test initialization of :class:`kleio.core.evc.adapters.DimensionAddition`"""
 
     def test_dimension_addition_init_with_param(self, dummy_param):
-        """Test initialization of :class:`orion.core.evc.adapters.DimensionAddition`
+        """Test initialization of :class:`kleio.core.evc.adapters.DimensionAddition`
         with valid param
         """
         dimension_addition_adapter = DimensionAddition(dummy_param)
@@ -93,7 +93,7 @@ class TestDimensionAdditionInit(object):
         assert dimension_addition_adapter.param is dummy_param
 
     def test_dimension_addition_init_with_bad_param(self):
-        """Test initialization of :class:`orion.core.evc.adapters.DimensionAddition`
+        """Test initialization of :class:`kleio.core.evc.adapters.DimensionAddition`
         with object which is not a param or a dictionary definition of it
         """
         with pytest.raises(TypeError) as exc_info:
@@ -102,13 +102,13 @@ class TestDimensionAdditionInit(object):
         assert "Invalid param argument type ('<class 'str'>')." in str(exc_info.value)
 
     def test_dimension_addition_init_with_dict(self, dummy_param):
-        """Test initialization of :class:`orion.core.evc.adapters.DimensionAddition`
+        """Test initialization of :class:`kleio.core.evc.adapters.DimensionAddition`
         with a dictionary definition of a param
         """
         DimensionAddition(dummy_param.to_dict())
 
     def test_dimension_addition_init_with_bad_dict(self):
-        """Test initialization of :class:`orion.core.evc.adapters.DimensionAddition`
+        """Test initialization of :class:`kleio.core.evc.adapters.DimensionAddition`
         with a dictionary which is a bad definition of a param
         """
         with pytest.raises(AttributeError) as exc_info:
@@ -118,10 +118,10 @@ class TestDimensionAdditionInit(object):
 
 
 class TestDimensionDeletionInit(object):
-    """Test initialization of :class:`orion.core.evc.adapters.DimensionDeletion`"""
+    """Test initialization of :class:`kleio.core.evc.adapters.DimensionDeletion`"""
 
     def test_dimension_deletion_init_with_param(self, dummy_param):
-        """Test initialization of :class:`orion.core.evc.adapters.DimensionDeletion`
+        """Test initialization of :class:`kleio.core.evc.adapters.DimensionDeletion`
         with valid param
         """
         dimension_deletion_adapter = DimensionDeletion(dummy_param)
@@ -129,7 +129,7 @@ class TestDimensionDeletionInit(object):
         assert dimension_deletion_adapter.param is dummy_param
 
     def test_dimension_deletion_init_with_bad_param(self):
-        """Test initialization of :class:`orion.core.evc.adapters.DimensionDeletion`
+        """Test initialization of :class:`kleio.core.evc.adapters.DimensionDeletion`
         with object which is not a param or a dictionary definition of it
         """
         with pytest.raises(TypeError) as exc_info:
@@ -138,13 +138,13 @@ class TestDimensionDeletionInit(object):
         assert "Invalid param argument type ('<class 'str'>')." in str(exc_info.value)
 
     def test_dimension_deletion_init_with_dict(self, dummy_param):
-        """Test initialization of :class:`orion.core.evc.adapters.DimensionDeletion`
+        """Test initialization of :class:`kleio.core.evc.adapters.DimensionDeletion`
         with a dictionary definition of a param
         """
         DimensionDeletion(dummy_param.to_dict())
 
     def test_dimension_deletion_init_with_bad_dict(self):
-        """Test initialization of :class:`orion.core.evc.adapters.DimensionDeletion`
+        """Test initialization of :class:`kleio.core.evc.adapters.DimensionDeletion`
         with a dictionary which is a bad definition of a param
         """
         with pytest.raises(AttributeError) as exc_info:
@@ -154,10 +154,10 @@ class TestDimensionDeletionInit(object):
 
 
 class TestDimensionPriorChangeInit(object):
-    """Test initialization of :class:`orion.core.evc.adapters.DimensionPriorChange`"""
+    """Test initialization of :class:`kleio.core.evc.adapters.DimensionPriorChange`"""
 
     def test_dimension_prior_change_init_with_dimensions(self, large_prior, small_prior):
-        """Test initialization of :class:`orion.core.evc.adapters.DimensionPriorChange`
+        """Test initialization of :class:`kleio.core.evc.adapters.DimensionPriorChange`
         with valid string definitions of dimension prior
         """
         dimension_prior_change = DimensionPriorChange('dummy', large_prior, small_prior)
@@ -171,7 +171,7 @@ class TestDimensionPriorChangeInit(object):
         assert dimension_prior_change.new_dimension.interval() == (0, 10)
 
     def test_dimension_prior_change_init_with_bad_dimensions(self):
-        """Test initialization of :class:`orion.core.evc.adapters.DimensionPriorChange`
+        """Test initialization of :class:`kleio.core.evc.adapters.DimensionPriorChange`
         with non valid string definitions of dimension prior
         """
         with pytest.raises(TypeError) as exc_info:
@@ -181,10 +181,10 @@ class TestDimensionPriorChangeInit(object):
 
 
 class TestDimensionRenamingInit(object):
-    """Test initialization of :class:`orion.core.evc.adapters.DimensionRenaming`"""
+    """Test initialization of :class:`kleio.core.evc.adapters.DimensionRenaming`"""
 
     def test_dimension_renaming_init(self):
-        """Test initialization of :class:`orion.core.evc.adapters.DimensionRenaming`
+        """Test initialization of :class:`kleio.core.evc.adapters.DimensionRenaming`
         with valid names
         """
         dimension_renaming = DimensionRenaming('old_name', 'new_name')
@@ -192,7 +192,7 @@ class TestDimensionRenamingInit(object):
         assert dimension_renaming.new_name == 'new_name'
 
     def test_dimension_renaming_init_bad_name(self):
-        """Test initialization of :class:`orion.core.evc.adapters.DimensionRenaming`
+        """Test initialization of :class:`kleio.core.evc.adapters.DimensionRenaming`
         with invalid names which are not strings
         """
         with pytest.raises(TypeError) as exc_info:
@@ -202,18 +202,18 @@ class TestDimensionRenamingInit(object):
 
 
 class TestAlgorithmChangeInit(object):
-    """Test initialization of :class:`orion.core.evc.adapters.AlgorithmChange`"""
+    """Test initialization of :class:`kleio.core.evc.adapters.AlgorithmChange`"""
 
     def test_algorithm_change_init(self):
-        """Test initialization of :class:`orion.core.evc.adapters.AlgorithmChange`"""
+        """Test initialization of :class:`kleio.core.evc.adapters.AlgorithmChange`"""
         AlgorithmChange()
 
 
 class TestCodeChangeInit(object):
-    """Test initialization of :class:`orion.core.evc.adapters.CodeChange`"""
+    """Test initialization of :class:`kleio.core.evc.adapters.CodeChange`"""
 
     def test_code_change_init(self):
-        """Test initialization of :class:`orion.core.evc.adapters.CodeChange`
+        """Test initialization of :class:`kleio.core.evc.adapters.CodeChange`
         with valid change types
         """
         code_change_adapter = CodeChange(CodeChange.NOEFFECT)
@@ -223,7 +223,7 @@ class TestCodeChangeInit(object):
         assert code_change_adapter.change_type == CodeChange.BREAK
 
     def test_code_change_init_bad_type(self):
-        """Test initialization of :class:`orion.core.evc.adapters.CodeChange`
+        """Test initialization of :class:`kleio.core.evc.adapters.CodeChange`
         with invalid change types
         """
         with pytest.raises(ValueError) as exc_info:
@@ -233,17 +233,17 @@ class TestCodeChangeInit(object):
 
 
 class TestCompositeAdapterInit(object):
-    """Test initialization of :class:`orion.core.evc.adapters.CompositeAdapter`"""
+    """Test initialization of :class:`kleio.core.evc.adapters.CompositeAdapter`"""
 
     def test_composite_adapter_init_emtpy(self):
-        """Test initialization of :class:`orion.core.evc.adapters.CompositeAdapter`
+        """Test initialization of :class:`kleio.core.evc.adapters.CompositeAdapter`
         with no adapters
         """
         composite_adapter = CompositeAdapter()
         assert len(composite_adapter.adapters) == 0
 
     def test_composite_adapter_init_with_adapters(self, dummy_param):
-        """Test initialization of :class:`orion.core.evc.adapters.CompositeAdapter`
+        """Test initialization of :class:`kleio.core.evc.adapters.CompositeAdapter`
         with valid adapters
         """
         dimension_addition = DimensionAddition(dummy_param)
@@ -254,7 +254,7 @@ class TestCompositeAdapterInit(object):
         assert isinstance(composite_adapter.adapters[1], DimensionDeletion)
 
     def test_composite_adapter_init_with_bad_adapters(self):
-        """Test initialization of :class:`orion.core.evc.adapters.CompositeAdapter`
+        """Test initialization of :class:`kleio.core.evc.adapters.CompositeAdapter`
         with invalid adapters
         """
         with pytest.raises(TypeError) as exc_info:
@@ -265,7 +265,7 @@ class TestCompositeAdapterInit(object):
 
 
 def test_adapter_creation(dummy_param):
-    """Test initialization using :meth:`orion.core.evc.adapters.Adapter.build`"""
+    """Test initialization using :meth:`kleio.core.evc.adapters.Adapter.build`"""
     adapter = Adapter.build([{
         'of_type': 'DimensionAddition',
         'param': dummy_param.to_dict()}])
@@ -277,12 +277,12 @@ def test_adapter_creation(dummy_param):
 
 
 class TestDimensionAdditionForwardBackward(object):
-    """Test :meth:`orion.core.evc.adapters.DimensionAddition.forward` and
-    :meth:`orion.core.evc.adapters.DimensionAddition.backward`
+    """Test :meth:`kleio.core.evc.adapters.DimensionAddition.forward` and
+    :meth:`kleio.core.evc.adapters.DimensionAddition.backward`
     """
 
     def test_dimension_addition_forward(self, trials):
-        """Test :meth:`orion.core.evc.adapters.DimensionAddition.forward`
+        """Test :meth:`kleio.core.evc.adapters.DimensionAddition.forward`
         with valid param and trials
         """
         new_param = Trial.Param(name='second_normal_prior', type='integer', value=1)
@@ -295,7 +295,7 @@ class TestDimensionAdditionForwardBackward(object):
         assert adapted_trials[-1].params[-1] == new_param
 
     def test_dimension_addition_forward_already_existing(self, trials):
-        """Test :meth:`orion.core.evc.adapters.DimensionAddition.forward`
+        """Test :meth:`kleio.core.evc.adapters.DimensionAddition.forward`
         with valid param and incompatible trials because param already exists
         """
         new_param = Trial.Param(name='normal_prior', type='integer', value=1)
@@ -306,7 +306,7 @@ class TestDimensionAdditionForwardBackward(object):
         assert "Provided trial does not have a compatible configuration" in str(exc_info.value)
 
     def test_dimension_addition_backward(self, dummy_param, trials):
-        """Test :meth:`orion.core.evc.adapters.DimensionAddition.backward`
+        """Test :meth:`kleio.core.evc.adapters.DimensionAddition.backward`
         with valid param and valid trials
         """
         new_param = Trial.Param(name='second_normal_prior', type='integer', value=1)
@@ -344,7 +344,7 @@ class TestDimensionAdditionForwardBackward(object):
         assert new_param not in (adapted_trials[2].params)
 
     def test_dimension_addition_backward_not_existing(self, trials):
-        """Test :meth:`orion.core.evc.adapters.DimensionAddition.backward`
+        """Test :meth:`kleio.core.evc.adapters.DimensionAddition.backward`
         with valid param and invalid trials because param does not exist
         """
         new_param = Trial.Param(name='second_normal_prior', type='integer', value=1)
@@ -356,12 +356,12 @@ class TestDimensionAdditionForwardBackward(object):
 
 
 class TestDimensionDeletionForwardBackward(object):
-    """Test :meth:`orion.core.evc.adapters.DimensionDeletion.forward` and
-    :meth:`orion.core.evc.adapters.DimensionDeletion.backward`
+    """Test :meth:`kleio.core.evc.adapters.DimensionDeletion.forward` and
+    :meth:`kleio.core.evc.adapters.DimensionDeletion.backward`
     """
 
     def test_dimension_deletion_forward(self, trials):
-        """Test :meth:`orion.core.evc.adapters.DimensionDeletion.forward`
+        """Test :meth:`kleio.core.evc.adapters.DimensionDeletion.forward`
         with valid param and valid trials
         """
         new_param = Trial.Param(name='second_normal_prior', type='integer', value=1)
@@ -399,7 +399,7 @@ class TestDimensionDeletionForwardBackward(object):
         assert new_param not in (adapted_trials[2].params)
 
     def test_dimension_deletion_forward_not_existing(self, trials):
-        """Test :meth:`orion.core.evc.adapters.DimensionDeletion.forward`
+        """Test :meth:`kleio.core.evc.adapters.DimensionDeletion.forward`
         with valid param and invalid trials because param does not exist
         """
         new_param = Trial.Param(name='second_normal_prior', type='integer', value=1)
@@ -410,7 +410,7 @@ class TestDimensionDeletionForwardBackward(object):
         assert "Provided trial does not have a compatible configuration" in str(exc_info.value)
 
     def test_dimension_deletion_backward(self, dummy_param, trials):
-        """Test :meth:`orion.core.evc.adapters.DimensionDeletion.backward`
+        """Test :meth:`kleio.core.evc.adapters.DimensionDeletion.backward`
         with valid param and valid trials
         """
         new_param = Trial.Param(name='second_normal_prior', type='integer', value=1)
@@ -423,7 +423,7 @@ class TestDimensionDeletionForwardBackward(object):
         assert adapted_trials[-1].params[-1] == new_param
 
     def test_dimension_deletion_backward_already_existing(self, trials):
-        """Test :meth:`orion.core.evc.adapters.DimensionDeletion.backward`
+        """Test :meth:`kleio.core.evc.adapters.DimensionDeletion.backward`
         with valid param and invalid trials because param already exist
         """
         new_param = Trial.Param(name='normal_prior', type='integer', value=1)
@@ -435,12 +435,12 @@ class TestDimensionDeletionForwardBackward(object):
 
 
 class TestDimensionPriorChangeForwardBackward(object):
-    """Test :meth:`orion.core.evc.adapters.DimensionPriorChange.forward` and
-    :meth:`orion.core.evc.adapters.DimensionPriorChange.backward`
+    """Test :meth:`kleio.core.evc.adapters.DimensionPriorChange.forward` and
+    :meth:`kleio.core.evc.adapters.DimensionPriorChange.backward`
     """
 
     def test_dimension_prior_change_forward(self, large_prior, small_prior, trials):
-        """Test :meth:`orion.core.evc.adapters.DimensionPriorChange.forward`
+        """Test :meth:`kleio.core.evc.adapters.DimensionPriorChange.forward`
         with compatible priors
         """
         dimension_prior_change_adapter = DimensionPriorChange(
@@ -452,7 +452,7 @@ class TestDimensionPriorChangeForwardBackward(object):
 
     def test_dimension_prior_change_forward_incompatible_dimensions(
             self, small_prior, disjoint_prior, trials):
-        """Test :meth:`orion.core.evc.adapters.DimensionPriorChange.forward`
+        """Test :meth:`kleio.core.evc.adapters.DimensionPriorChange.forward`
         with incompatible priors, such that all trials are filtered out
         """
         dimension_prior_change_adapter = DimensionPriorChange(
@@ -463,7 +463,7 @@ class TestDimensionPriorChangeForwardBackward(object):
         assert len(adapted_trials) == 0
 
     def test_dimension_prior_change_backward(self, large_prior, small_prior, trials):
-        """Test :meth:`orion.core.evc.adapters.DimensionPriorChange.backward`
+        """Test :meth:`kleio.core.evc.adapters.DimensionPriorChange.backward`
         with compatible priors
         """
         dimension_prior_change_adapter = DimensionPriorChange(
@@ -475,7 +475,7 @@ class TestDimensionPriorChangeForwardBackward(object):
 
     def test_dimension_prior_change_backward_incompatible_dimensions(
             self, disjoint_prior, small_prior, trials):
-        """Test :meth:`orion.core.evc.adapters.DimensionPriorChange.backward`
+        """Test :meth:`kleio.core.evc.adapters.DimensionPriorChange.backward`
         with incompatible priors, such that all trials are filtered out
         """
         dimension_prior_change_adapter = DimensionPriorChange(
@@ -487,12 +487,12 @@ class TestDimensionPriorChangeForwardBackward(object):
 
 
 class TestDimensionRenamingForwardBackward(object):
-    """Test :meth:`orion.core.evc.adapters.DimensionRenaming.forward` and
-    :meth:`orion.core.evc.adapters.DimensionRenaming.backward`
+    """Test :meth:`kleio.core.evc.adapters.DimensionRenaming.forward` and
+    :meth:`kleio.core.evc.adapters.DimensionRenaming.backward`
     """
 
     def test_dimension_renaming_forward(self, trials):
-        """Test :meth:`orion.core.evc.adapters.DimensionRenaming.forward`
+        """Test :meth:`kleio.core.evc.adapters.DimensionRenaming.forward`
         with valid names
         """
         old_name = 'small_prior'
@@ -511,7 +511,7 @@ class TestDimensionRenamingForwardBackward(object):
         assert old_name not in [param.name for param in adapted_trials[-1].params]
 
     def test_dimension_renaming_forward_incompatible(self, trials):
-        """Test :meth:`orion.core.evc.adapters.DimensionRenaming.forward`
+        """Test :meth:`kleio.core.evc.adapters.DimensionRenaming.forward`
         with non existing old name in trials
         """
         old_name = 'bad name'
@@ -524,7 +524,7 @@ class TestDimensionRenamingForwardBackward(object):
         assert "Provided trial does not have a compatible configuration" in str(exc_info.value)
 
     def test_dimension_renaming_backward(self, trials):
-        """Test :meth:`orion.core.evc.adapters.DimensionRenaming.backward`
+        """Test :meth:`kleio.core.evc.adapters.DimensionRenaming.backward`
         with valid names
         """
         old_name = 'old_name'
@@ -543,7 +543,7 @@ class TestDimensionRenamingForwardBackward(object):
         assert new_name not in [param.name for param in adapted_trials[-1].params]
 
     def test_dimension_renaming_backward_incompatible(self, trials):
-        """Test :meth:`orion.core.evc.adapters.DimensionRenaming.backward`
+        """Test :meth:`kleio.core.evc.adapters.DimensionRenaming.backward`
         with non existing new name in trials
         """
         old_name = 'small_prior'
@@ -557,12 +557,12 @@ class TestDimensionRenamingForwardBackward(object):
 
 
 class TestAlgorithmChangeForwardBackward(object):
-    """Test :meth:`orion.core.evc.adapters.AlgorithmChange.forward` and
-    :meth:`orion.core.evc.adapters.AlgorithmChange.backward`
+    """Test :meth:`kleio.core.evc.adapters.AlgorithmChange.forward` and
+    :meth:`kleio.core.evc.adapters.AlgorithmChange.backward`
     """
 
     def test_algorithm_change_forward(self, trials):
-        """Test :meth:`orion.core.evc.adapters.AlgorithmChange.forward`"""
+        """Test :meth:`kleio.core.evc.adapters.AlgorithmChange.forward`"""
         algorithm_change_adaptor = AlgorithmChange()
 
         adapted_trials = algorithm_change_adaptor.forward(trials)
@@ -573,7 +573,7 @@ class TestAlgorithmChangeForwardBackward(object):
         assert adapted_trials[-1] is trials[-1]
 
     def test_algorithm_change_backward(self, trials):
-        """Test :meth:`orion.core.evc.adapters.AlgorithmChange.backward`"""
+        """Test :meth:`kleio.core.evc.adapters.AlgorithmChange.backward`"""
         algorithm_change_adaptor = AlgorithmChange()
 
         adapted_trials = algorithm_change_adaptor.backward(trials)
@@ -585,12 +585,12 @@ class TestAlgorithmChangeForwardBackward(object):
 
 
 class TestCodeChangeForwardBackward(object):
-    """Test :meth:`orion.core.evc.adapters.CodeChange.forward` and
-    :meth:`orion.core.evc.adapters.CodeChange.backward`
+    """Test :meth:`kleio.core.evc.adapters.CodeChange.forward` and
+    :meth:`kleio.core.evc.adapters.CodeChange.backward`
     """
 
     def test_code_change_forward_noeffect(self, trials):
-        """Test :meth:`orion.core.evc.adapters.CodeChange.forward` with change type NOEFFECT"""
+        """Test :meth:`kleio.core.evc.adapters.CodeChange.forward` with change type NOEFFECT"""
         code_change_adapter = CodeChange(CodeChange.NOEFFECT)
 
         adapted_trials = code_change_adapter.forward(trials)
@@ -601,7 +601,7 @@ class TestCodeChangeForwardBackward(object):
         assert adapted_trials[-1] is trials[-1]
 
     def test_code_change_forward_unsure(self, trials):
-        """Test :meth:`orion.core.evc.adapters.CodeChange.forward` with change type UNSURE"""
+        """Test :meth:`kleio.core.evc.adapters.CodeChange.forward` with change type UNSURE"""
         code_change_adapter = CodeChange(CodeChange.UNSURE)
 
         adapted_trials = code_change_adapter.forward(trials)
@@ -612,7 +612,7 @@ class TestCodeChangeForwardBackward(object):
         assert adapted_trials[-1] is trials[-1]
 
     def test_code_change_forward_break(self, trials):
-        """Test :meth:`orion.core.evc.adapters.CodeChange.forward` with change type BREAK"""
+        """Test :meth:`kleio.core.evc.adapters.CodeChange.forward` with change type BREAK"""
         code_change_adapter = CodeChange(CodeChange.BREAK)
 
         adapted_trials = code_change_adapter.forward(trials)
@@ -620,7 +620,7 @@ class TestCodeChangeForwardBackward(object):
         assert len(adapted_trials) == 0
 
     def test_code_change_backward_noeffect(self, trials):
-        """Test :meth:`orion.core.evc.adapters.CodeChange.backward` with change type NOEFFECT"""
+        """Test :meth:`kleio.core.evc.adapters.CodeChange.backward` with change type NOEFFECT"""
         code_change_adapter = CodeChange(CodeChange.NOEFFECT)
 
         adapted_trials = code_change_adapter.backward(trials)
@@ -631,7 +631,7 @@ class TestCodeChangeForwardBackward(object):
         assert adapted_trials[-1] is trials[-1]
 
     def test_code_change_backward_unsure(self, trials):
-        """Test :meth:`orion.core.evc.adapters.CodeChange.backward` with change type UNSURE"""
+        """Test :meth:`kleio.core.evc.adapters.CodeChange.backward` with change type UNSURE"""
         code_change_adapter = CodeChange(CodeChange.UNSURE)
 
         adapted_trials = code_change_adapter.backward(trials)
@@ -639,7 +639,7 @@ class TestCodeChangeForwardBackward(object):
         assert len(adapted_trials) == 0
 
     def test_code_change_backward_break(self, trials):
-        """Test :meth:`orion.core.evc.adapters.CodeChange.backward` with change type BREAK"""
+        """Test :meth:`kleio.core.evc.adapters.CodeChange.backward` with change type BREAK"""
         code_change_adapter = CodeChange(CodeChange.BREAK)
 
         adapted_trials = code_change_adapter.backward(trials)
@@ -648,13 +648,13 @@ class TestCodeChangeForwardBackward(object):
 
 
 class TestCompositeAdapterForwardBackward(object):
-    """Test :meth:`orion.core.evc.adapters.CompositeAdapter.forward` and
-    :meth:`orion.core.evc.adapters.CompositeAdapter.backward`
+    """Test :meth:`kleio.core.evc.adapters.CompositeAdapter.forward` and
+    :meth:`kleio.core.evc.adapters.CompositeAdapter.backward`
     """
 
     def test_composite_adapter_forward_emtpy(self, trials):
-        """Test :meth:`orion.core.evc.adapters.CompositeAdapter.forward` and
-        :meth:`orion.core.evc.adapters.CompositeAdapter.backward` with no adapters
+        """Test :meth:`kleio.core.evc.adapters.CompositeAdapter.forward` and
+        :meth:`kleio.core.evc.adapters.CompositeAdapter.backward` with no adapters
         """
         composite_adapter = CompositeAdapter()
 
@@ -662,7 +662,7 @@ class TestCompositeAdapterForwardBackward(object):
         assert len(composite_adapter.backward(trials)) == len(trials)
 
     def test_composite_adapter_forward(self, dummy_param, trials):
-        """Test :meth:`orion.core.evc.adapters.CompositeAdapter.forward` with two adapters"""
+        """Test :meth:`kleio.core.evc.adapters.CompositeAdapter.forward` with two adapters"""
         new_param = Trial.Param(name='second_normal_prior', type='integer', value=1)
 
         dimension_addition_adapter = DimensionAddition(new_param)
@@ -687,7 +687,7 @@ class TestCompositeAdapterForwardBackward(object):
         assert new_param not in (adapted_trials[-1].params)
 
     def test_composite_adapter_backward(self, dummy_param, trials):
-        """Test :meth:`orion.core.evc.adapters.CompositeAdapter.backward` with two adapters"""
+        """Test :meth:`kleio.core.evc.adapters.CompositeAdapter.backward` with two adapters"""
         new_param = Trial.Param(name='second_normal_prior', type='integer', value=1)
 
         dimension_addition_adapter = DimensionAddition(new_param)
@@ -713,7 +713,7 @@ class TestCompositeAdapterForwardBackward(object):
 
 
 def test_dimension_addition_configuration(dummy_param):
-    """Test :meth:`orion.core.evc.adapters.DimensionAddition.configuration`"""
+    """Test :meth:`kleio.core.evc.adapters.DimensionAddition.configuration`"""
     dimension_addition_adapter = DimensionAddition(dummy_param)
 
     configuration = dimension_addition_adapter.configuration[0]
@@ -725,7 +725,7 @@ def test_dimension_addition_configuration(dummy_param):
 
 
 def test_dimension_deletion_configuration(dummy_param):
-    """Test :meth:`orion.core.evc.adapters.DimensionDeletion.configuration`"""
+    """Test :meth:`kleio.core.evc.adapters.DimensionDeletion.configuration`"""
     dimension_deletion_adapter = DimensionDeletion(dummy_param)
 
     configuration = dimension_deletion_adapter.configuration[0]
@@ -737,7 +737,7 @@ def test_dimension_deletion_configuration(dummy_param):
 
 
 def test_dimension_prior_change_configuration(small_prior, large_prior):
-    """Test :meth:`orion.core.evc.adapters.DimensionPriorChange.configuration`"""
+    """Test :meth:`kleio.core.evc.adapters.DimensionPriorChange.configuration`"""
     dimension_name = 'small_prior'
     dimension_prior_change_adapter = DimensionPriorChange(dimension_name, small_prior, large_prior)
 
@@ -752,7 +752,7 @@ def test_dimension_prior_change_configuration(small_prior, large_prior):
 
 
 def test_dimension_renaming_configuration():
-    """Test :meth:`orion.core.evc.adapters.DimensionRenaming.configuration`"""
+    """Test :meth:`kleio.core.evc.adapters.DimensionRenaming.configuration`"""
     old_name = 'old_name'
     new_name = 'new_name'
     dimension_renaming_adapter = DimensionRenaming(old_name, new_name)
@@ -767,7 +767,7 @@ def test_dimension_renaming_configuration():
 
 
 def test_algorithm_change_configuration():
-    """Test :meth:`orion.core.evc.adapters.AlgorithmChange.configuration`"""
+    """Test :meth:`kleio.core.evc.adapters.AlgorithmChange.configuration`"""
     algorithm_change_adaptor = AlgorithmChange()
 
     configuration = algorithm_change_adaptor.configuration[0]
@@ -778,7 +778,7 @@ def test_algorithm_change_configuration():
 
 
 def test_code_change_configuration():
-    """Test :meth:`orion.core.evc.adapters.CodeChange.configuration`"""
+    """Test :meth:`kleio.core.evc.adapters.CodeChange.configuration`"""
     code_change_adaptor = CodeChange(CodeChange.UNSURE)
 
     configuration = code_change_adaptor.configuration[0]
@@ -790,7 +790,7 @@ def test_code_change_configuration():
 
 
 def test_composite_configuration(dummy_param):
-    """Test :meth:`orion.core.evc.adapters.CompositeAdapter.configuration`"""
+    """Test :meth:`kleio.core.evc.adapters.CompositeAdapter.configuration`"""
     new_param = Trial.Param(name='second_normal_prior', type='integer', value=1)
     dimension_addition_adapter = DimensionAddition(dummy_param)
     dimension_deletion_adapter = DimensionDeletion(new_param)

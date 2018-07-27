@@ -7,10 +7,10 @@ import subprocess
 import numpy
 import pytest
 
-import orion.core.cli
-from orion.core.io.database import Database
-from orion.core.worker import workon
-from orion.core.worker.experiment import Experiment
+import kleio.core.cli
+from kleio.core.io.database import Database
+from kleio.core.worker import workon
+from kleio.core.worker.experiment import Experiment
 
 
 @pytest.mark.usefixtures("clean_db")
@@ -18,10 +18,10 @@ from orion.core.worker.experiment import Experiment
 def test_demo_with_default_algo_cli_config_only(database, monkeypatch):
     """Check that random algorithm is used, when no algo is chosen explicitly."""
     monkeypatch.chdir(os.path.dirname(os.path.abspath(__file__)))
-    monkeypatch.setenv('ORION_DB_NAME', 'orion_test')
+    monkeypatch.setenv('ORION_DB_NAME', 'kleio_test')
     monkeypatch.setenv('ORION_DB_ADDRESS', 'mongodb://user:pass@localhost')
 
-    orion.core.cli.main(["hunt", "-n", "default_algo",
+    kleio.core.cli.main(["hunt", "-n", "default_algo",
                          "--max-trials", "30",
                          "./black_box.py", "-x~uniform(-50, 50)"])
 
@@ -35,7 +35,7 @@ def test_demo_with_default_algo_cli_config_only(database, monkeypatch):
     assert exp['algorithms'] == {'random': {}}
     assert 'user' in exp['metadata']
     assert 'datetime' in exp['metadata']
-    assert 'orion_version' in exp['metadata']
+    assert 'kleio_version' in exp['metadata']
     assert 'user_script' in exp['metadata']
     assert os.path.isabs(exp['metadata']['user_script'])
     assert exp['metadata']['user_args'] == ['-x~uniform(-50, 50)']
@@ -46,7 +46,7 @@ def test_demo_with_default_algo_cli_config_only(database, monkeypatch):
 def test_demo(database, monkeypatch):
     """Test a simple usage scenario."""
     monkeypatch.chdir(os.path.dirname(os.path.abspath(__file__)))
-    orion.core.cli.main(["hunt", "--config", "./orion_config.yaml",
+    kleio.core.cli.main(["hunt", "--config", "./kleio_config.yaml",
                          "./black_box.py", "-x~uniform(-50, 50)"])
 
     exp = list(database.experiments.find({'name': 'voila_voici'}))
@@ -61,7 +61,7 @@ def test_demo(database, monkeypatch):
                                                       'dx_tolerance': 1e-7}}
     assert 'user' in exp['metadata']
     assert 'datetime' in exp['metadata']
-    assert 'orion_version' in exp['metadata']
+    assert 'kleio_version' in exp['metadata']
     assert 'user_script' in exp['metadata']
     assert os.path.isabs(exp['metadata']['user_script'])
     assert exp['metadata']['user_args'] == ['-x~uniform(-50, 50)']
@@ -91,8 +91,8 @@ def test_demo_two_workers(database, monkeypatch):
     monkeypatch.chdir(os.path.dirname(os.path.abspath(__file__)))
     processes = []
     for _ in range(2):
-        process = subprocess.Popen(["orion", "hunt", "-n", "two_workers_demo",
-                                    "--config", "./orion_config_random.yaml",
+        process = subprocess.Popen(["kleio", "hunt", "-n", "two_workers_demo",
+                                    "--config", "./kleio_config_random.yaml",
                                     "./black_box.py", "-x~norm(34, 3)"])
         processes.append(process)
 
@@ -111,7 +111,7 @@ def test_demo_two_workers(database, monkeypatch):
     assert exp['algorithms'] == {'random': {}}
     assert 'user' in exp['metadata']
     assert 'datetime' in exp['metadata']
-    assert 'orion_version' in exp['metadata']
+    assert 'kleio_version' in exp['metadata']
     assert 'user_script' in exp['metadata']
     assert os.path.isabs(exp['metadata']['user_script'])
     assert exp['metadata']['user_args'] == ['-x~norm(34, 3)']
@@ -131,7 +131,7 @@ def test_demo_two_workers(database, monkeypatch):
 def test_workon(database):
     """Test scenario having a configured experiment already setup."""
     try:
-        Database(of_type='MongoDB', name='orion_test',
+        Database(of_type='MongoDB', name='kleio_test',
                  username='user', password='pass')
     except (TypeError, ValueError):
         pass
@@ -196,7 +196,7 @@ def test_stress_unique_folder_creation(database, monkeypatch, tmpdir, capfd):
     # seed of Oríon
     how_many = 1000
     monkeypatch.chdir(os.path.dirname(os.path.abspath(__file__)))
-    orion.core.cli.main(["hunt", "--max-trials={}".format(how_many),
+    kleio.core.cli.main(["hunt", "--max-trials={}".format(how_many),
                          "--pool-size=1",
                          "--name=lalala",
                          "--config", "./stress_gradient.yaml",
@@ -242,10 +242,10 @@ def test_stress_unique_folder_creation(database, monkeypatch, tmpdir, capfd):
 def test_run_with_name_only(database, monkeypatch):
     """Test hunt can be executed with experiment name only"""
     monkeypatch.chdir(os.path.dirname(os.path.abspath(__file__)))
-    orion.core.cli.main(["init_only", "--config", "./orion_config_random.yaml",
+    kleio.core.cli.main(["init_only", "--config", "./kleio_config_random.yaml",
                          "./black_box.py", "-x~uniform(-50, 50)"])
 
-    orion.core.cli.main(["hunt", "--max-trials", "20", "--config", "./orion_config_random.yaml"])
+    kleio.core.cli.main(["hunt", "--max-trials", "20", "--config", "./kleio_config_random.yaml"])
 
     exp = list(database.experiments.find({'name': 'demo_random_search'}))
     assert len(exp) == 1
@@ -262,11 +262,11 @@ def test_run_with_name_only(database, monkeypatch):
 def test_run_with_name_only_with_trailing_whitespace(database, monkeypatch):
     """Test hunt can be executed with experiment name and trailing whitespace"""
     monkeypatch.chdir(os.path.dirname(os.path.abspath(__file__)))
-    orion.core.cli.main(["init_only", "--config", "./orion_config_random.yaml",
+    kleio.core.cli.main(["init_only", "--config", "./kleio_config_random.yaml",
                          "./black_box.py", "-x~uniform(-50, 50)"])
 
-    orion.core.cli.main(["hunt", "--max-trials", "20",
-                         "--config", "./orion_config_random.yaml", ""])
+    kleio.core.cli.main(["hunt", "--max-trials", "20",
+                         "--config", "./kleio_config_random.yaml", ""])
 
     exp = list(database.experiments.find({'name': 'demo_random_search'}))
     assert len(exp) == 1

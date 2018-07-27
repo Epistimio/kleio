@@ -41,7 +41,7 @@ Create a MongoDB
 
 Invoke the following command as you can read `here <https://docs.mongodb.com/manual/reference/method/db.createUser/>`_::
 
-   mongo orion_test --eval 'db.createUser({user:"user",pwd:"pass",roles:["readWrite"]});'
+   mongo kleio_test --eval 'db.createUser({user:"user",pwd:"pass",roles:["readWrite"]});'
 
 Configuring Oríon's Database
 ============================
@@ -56,17 +56,17 @@ Oríon configuration files.
    .. code-block:: sh
 
       export ORION_DB_ADDRESS=mongodb://user:pass@localhost
-      export ORION_DB_NAME=orion_test
+      export ORION_DB_NAME=kleio_test
       export ORION_DB_TYPE=MongoDB
 
-   2. By creating a section in an Oríon's configuration YAML file, like `this one <https://github.com/mila-udem/orion/blob/master/tests/functional/demo/orion_config_random.yaml>`_
+   2. By creating a section in an Oríon's configuration YAML file, like `this one <https://github.com/mila-udem/kleio/blob/master/tests/functional/demo/kleio_config_random.yaml>`_
       used by our functional tests.
 
    .. code-block:: yaml
 
       database:
         type: 'mongodb'
-          name: 'orion_test'
+          name: 'kleio_test'
           host: 'mongodb://user:pass@localhost'
 
 As it will be referenced with detail in :doc:`configuration's documentation </user/configuring>`,
@@ -115,11 +115,11 @@ Connect
 https://docs.atlas.mongodb.com/mongo-shell-connection/
 
 Test with
-mongo "mongodb+srv://orion-efjp0.mongodb.net/test" --username bouthilx
+mongo "mongodb+srv://kleio-efjp0.mongodb.net/test" --username bouthilx
 
 
 Connect Your Application
-Orion supports MongoDB drive 3.4
+Kleiṓ supports MongoDB drive 3.4
 Copy the address
 
 database:

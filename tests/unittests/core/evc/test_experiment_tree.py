@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""Collection of tests for :mod:`orion.core.evc.experiment`."""
+"""Collection of tests for :mod:`kleio.core.evc.experiment`."""
 
 import pytest
 
-from orion.core.evc.adapters import Adapter, CodeChange
-from orion.core.evc.experiment import ExperimentNode
-from orion.core.worker.experiment import ExperimentView
+from kleio.core.evc.adapters import Adapter, CodeChange
+from kleio.core.evc.experiment import ExperimentNode
+from kleio.core.worker.experiment import ExperimentView
 
 
 # To avoid flake8 issues

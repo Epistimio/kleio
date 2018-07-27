@@ -1,7 +1,7 @@
 Command lines
 =============
 
-.. automodule:: orion.core.cli
+.. automodule:: kleio.core.cli
    :members:
 
 .. toctree::

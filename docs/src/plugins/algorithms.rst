@@ -31,7 +31,7 @@ actual functional testing, gradient_descent_algo_.
 Implement Basic Algorithms
 ==========================
 
-Template `src/orion/algo/gradient_descent.py <gradient_descent_algo_code>`_
+Template `src/kleio/algo/gradient_descent.py <gradient_descent_algo_code>`_
 TODO
 
 The Space Class
@@ -39,6 +39,6 @@ The Space Class
 
 TODO
 
-.. _gradient_descent_algo: https://github.com/mila-udem/orion/tree/master/tests/functional/gradient_descent_algo
-.. _gradient_descent_algo_code: https://github.com/mila-udem/orion/blob/master/tests/functional/gradient_descent_algo/src/orion/algo/gradient_descent.py
+.. _gradient_descent_algo: https://github.com/mila-udem/kleio/tree/master/tests/functional/gradient_descent_algo
+.. _gradient_descent_algo_code: https://github.com/mila-udem/kleio/blob/master/tests/functional/gradient_descent_algo/src/kleio/algo/gradient_descent.py
 

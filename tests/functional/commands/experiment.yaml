@@ -1,16 +1,16 @@
-# Example `orion` database, first are the "primary keys" (there's also an
+# Example `kleio` database, first are the "primary keys" (there's also an
 # implicit _id key here in MongoDB, but we cannot base our search based on that)
 ---
 
 # Example of entries in `experiments` collection
 # configurations: some are inferred automatically,
-# but most depend on user's input to `orion`
+# but most depend on user's input to `kleio`
 - name: test_insert_normal
 
   metadata:
     user: corneau
     datetime: 2017-11-22T20:00:00
-    orion_version: 0.post246.dev0+g7aae75d
+    kleio_version: 0.post246.dev0+g7aae75d
     user_script: full_path/main.py
     user_args: ["-x~normal(10,10,default_value=1)"]
     user_vcs: git
@@ -30,7 +30,7 @@
   metadata:
     user: corneau
     datetime: 2017-11-22T20:00:00
-    orion_version: 0.post246.dev0+g7aae75d
+    kleio_version: 0.post246.dev0+g7aae75d
     user_script: full_path/main.py
     user_args: ["-x~normal(10,10)"]
     user_vcs: git
@@ -50,7 +50,7 @@
   metadata:
     user: corneau
     datetime: 2017-11-22T20:00:00
-    orion_version: 0.post246.dev0+g7aae75d
+    kleio_version: 0.post246.dev0+g7aae75d
     user_script: full_path/main.py
     user_args: ["-x~normal(10,10)", "-y~uniform(1, 30)"]
     user_vcs: git

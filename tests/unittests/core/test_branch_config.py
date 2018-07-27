@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""Collection of tests for :mod:`orion.core.io.experiment_branch_builder`."""
+"""Collection of tests for :mod:`kleio.core.io.experiment_branch_builder`."""
 
 import copy
 import os
@@ -8,12 +8,12 @@ import os
 import pytest
 import yaml
 
-from orion.core import evc
-from orion.core.evc.conflicts import (
+from kleio.core import evc
+from kleio.core.evc.conflicts import (
     AlgorithmConflict, ChangedDimensionConflict, CodeConflict, CommandLineConflict,
     detect_conflicts, ExperimentNameConflict, MissingDimensionConflict, NewDimensionConflict,
     ScriptConfigConflict)
-from orion.core.io.experiment_branch_builder import ExperimentBranchBuilder
+from kleio.core.io.experiment_branch_builder import ExperimentBranchBuilder
 
 
 def filter_true(c):
@@ -30,9 +30,9 @@ def filter_false(c):
 def user_config():
     """Generate data dict for user's script's configuration file"""
     data = {
-        'a': 'orion~uniform(-10,10)',
+        'a': 'kleio~uniform(-10,10)',
         'some_other': 'test',
-        'b': 'orion~normal(0,1)',
+        'b': 'kleio~normal(0,1)',
         'argument': 'value'}
     return data
 
@@ -120,7 +120,7 @@ def same_userconfig_config(user_config, child_config):
 def changed_userconfig_config(user_config, child_config):
     """Create a child config with a changed dimension"""
     config_file_path = './changed_config.yaml'
-    user_config['b'] = 'orion~uniform(-20, 0)'
+    user_config['b'] = 'kleio~uniform(-20, 0)'
     user_config['some_other'] = 'hello'
     with open(config_file_path, 'w') as f:
         yaml.dump(user_config, f)

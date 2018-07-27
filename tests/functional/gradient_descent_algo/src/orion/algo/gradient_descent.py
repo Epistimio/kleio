@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-:mod:`orion.algo.gradient_descent` -- Perform gradient descent on a loss surface
+:mod:`kleio.algo.gradient_descent` -- Perform gradient descent on a loss surface
 ================================================================================
 
 .. module:: gradient_descent
@@ -10,7 +10,7 @@
 """
 import numpy
 
-from orion.algo.base import BaseAlgorithm
+from kleio.algo.base import BaseAlgorithm
 
 
 class Gradient_Descent(BaseAlgorithm):

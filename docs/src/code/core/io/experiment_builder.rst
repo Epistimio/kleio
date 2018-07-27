@@ -1,5 +1,5 @@
 Experiment Builder
 ==================
 
-.. automodule:: orion.core.io.experiment_builder
+.. automodule:: kleio.core.io.experiment_builder
    :members:

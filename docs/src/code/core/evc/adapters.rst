@@ -1,5 +1,5 @@
 Adapters for trials compatibility between experiments
 =====================================================
 
-.. automodule:: orion.core.evc.adapters
+.. automodule:: kleio.core.evc.adapters
    :members:

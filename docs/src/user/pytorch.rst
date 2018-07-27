@@ -29,7 +29,7 @@ Add in top
 
 .. code-block:: python
 
-    from orion.client import report_results
+    from kleio.client import report_results
 
 Add to last line of test()
 
@@ -53,11 +53,11 @@ Execution
 
 .. code-block:: bash
 
-    $ orion -v hunt -n lenet-mnist \
+    $ kleio -v hunt -n lenet-mnist \
         ./main.py --lr~'loguniform(1e-5, 1.0)' --momentum~'uniform(0, 1)'
 
 
-.. # orion submit -n resnet18-cifar10 mysubmissionfile
+.. # kleio submit -n resnet18-cifar10 mysubmissionfile
 
 
 Analysis
