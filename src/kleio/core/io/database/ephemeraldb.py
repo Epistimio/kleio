@@ -12,6 +12,7 @@ from collections import defaultdict
 import copy
 
 from kleio.core.io.database import AbstractDB, DuplicateKeyError
+from kleio.core.utils import flatten, unflatten
 
 
 class EphemeralDB(AbstractDB):
@@ -111,6 +112,12 @@ class EphemeralDB(AbstractDB):
         dbcollection = self._db[collection_name]
 
         return dbcollection.delete_many(query=query)
+
+    def write_file(self, collection_name, data, **kwargs):
+        return {}
+
+    def read_file(self, collection_name, query):
+        return []
 
 
 class EphemeralCollection(object):
@@ -276,14 +283,14 @@ class EphemeralDocument(object):
 
     def __init__(self, data):
         """Initialise the document with a flattened version of the data"""
-        self._data = _flatten(data)
+        self._data = flatten(data)
 
     def match(self, query=None):
         """Test if the document corresponds to a given query"""
         if query is None or query == {}:
             return True
 
-        query = _flatten(query)
+        query = flatten(query)
         for key, value in query.items():
             if not self.match_key(key, value):
                 return False
@@ -345,9 +352,9 @@ class EphemeralDocument(object):
 
         """
         if not keys:
-            return _unflatten(self._data)
+            return unflatten(self._data)
 
-        keys = _flatten(keys)
+        keys = flatten(keys)
         keys = self._validate_keys(keys)
 
         selection = dict()
@@ -369,7 +376,7 @@ class EphemeralDocument(object):
                 if include and key_is_match(key, selected_key):
                     selection[key] = value
 
-        return _unflatten(selection)
+        return unflatten(selection)
 
     def update(self, data):
         """Update the values of the document.
@@ -381,7 +388,7 @@ class EphemeralDocument(object):
             the data, the corresponding `data[$set]` will be used instead.
 
         """
-        data = _flatten(data.get("$set", data))
+        data = flatten(data.get("$set", data))
         self._data.update(data)
 
     def to_dict(self):
@@ -395,39 +402,3 @@ class EphemeralDocument(object):
     def __contains__(self, key):
         """Test whether the given key is present in the document"""
         return key in self._data
-
-
-def _flatten(dictionary):
-    def __flatten(dictionary):
-        if dictionary == {}:
-            return dictionary
-
-        key, value = dictionary.popitem()
-        if not isinstance(value, dict) or not value:
-            new_dictionary = {key: value}
-            new_dictionary.update(__flatten(dictionary))
-            return new_dictionary
-
-        flat_sub_dictionary = __flatten(value)
-        for flat_sub_key in list(flat_sub_dictionary.keys()):
-            flat_key = key + '.' + flat_sub_key
-            flat_sub_dictionary[flat_key] = flat_sub_dictionary.pop(flat_sub_key)
-
-        new_dictionary = flat_sub_dictionary
-        new_dictionary.update(_flatten(dictionary))
-        return new_dictionary
-
-    return __flatten(copy.deepcopy(dictionary))
-
-
-def _unflatten(dictionary):
-    unflattened_dictionary = dict()
-    for key, value in dictionary.items():
-        parts = key.split(".")
-        sub_dictionary = unflattened_dictionary
-        for part in parts[:-1]:
-            if part not in sub_dictionary:
-                sub_dictionary[part] = dict()
-            sub_dictionary = sub_dictionary[part]
-        sub_dictionary[parts[-1]] = value
-    return unflattened_dictionary

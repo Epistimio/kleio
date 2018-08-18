@@ -11,8 +11,10 @@
 import argparse
 import logging
 import textwrap
+import sys
 
 import kleio
+from kleio.core.cli.default import add_default_subparser
 
 
 CLI_DOC_HEADER = """
@@ -20,6 +22,63 @@ kleio:
   Kleiṓ cli script for asynchronous distributed optimization
 
 """
+
+
+def set_default_subparser(self, name, args=None, positional_args=0):
+    """default subparser selection. Call after setup, just before parse_args()
+    name: is the name of the subparser to call by default
+    args: if set is the argument list handed to parse_args()
+
+    , tested with 2.7, 3.2, 3.3, 3.4
+    it works with 2.6 assuming argparse is installed
+    """
+    subparser_found = False
+    existing_default = False # check if default parser previously defined
+    for arg in sys.argv[1:]:
+        if arg in ['-h', '--help']:  # global help if no subparser
+            break
+    else:
+        for x in self._subparsers._actions:
+            if not isinstance(x, argparse._SubParsersAction):
+                continue
+            for sp_name in list(x._name_parser_map.keys()):
+                if sp_name in sys.argv[1:]:
+                    subparser_found = True
+                if sp_name == name: # check existance of default parser
+                    existing_default = True
+        if not subparser_found:
+            # If the default subparser is not among the existing ones,
+            # create a new parser.
+            # As this is called just before 'parse_args', the default
+            # parser created here will not pollute the help output.
+
+            if not existing_default:
+                for x in self._subparsers._actions:
+                    if not isinstance(x, argparse._SubParsersAction):
+                        continue
+                    add_default_subparser(x, name)
+                    break # this works OK, but should I check further?
+
+            # insert default in last position before global positional
+            # arguments, this implies no global options are specified after
+            # first positional argument
+            if args is None:
+                args = sys.argv
+
+            # TODO: Only check first positional argument 
+            if name in sys.argv[1:]:
+                return
+
+            positional_args = 0
+            for i in range(1, len(args[1:])):
+                if not args[i].startswith("-"):
+                    positional_args = i
+                    break
+
+            args.insert(positional_args, name)
+
+
+argparse.ArgumentParser.set_default_subparser = set_default_subparser
 
 
 class KleioArgsParser:
@@ -54,6 +113,7 @@ class KleioArgsParser:
 
     def parse(self, argv):
         """Call argparse and generate a dictionary of arguments' value"""
+        self.parser.set_default_subparser('run', args=argv, positional_args=1)
         args = vars(self.parser.parse_args(argv))
 
         verbose = args.pop('verbose', 0)

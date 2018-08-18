@@ -10,6 +10,7 @@
 """
 import functools
 
+import gridfs
 import pymongo
 
 from kleio.core.io.database import (
@@ -182,10 +183,11 @@ class MongoDB(AbstractDB):
             result = dbcollection.insert_many(documents=data)
             return result.acknowledged
 
-        update_data = {'$set': data}
+        if not any(key.startswith('$') for key in data.keys()):
+            data = {'$set': data}
 
         result = dbcollection.update_many(filter=query,
-                                          update=update_data,
+                                          update=data,
                                           upsert=True)
         return result.acknowledged
 
@@ -241,6 +243,15 @@ class MongoDB(AbstractDB):
 
         result = dbcollection.delete_many(filter=query)
         return result.acknowledged
+
+    def write_file(self, collection_name, data, **kwargs):
+        # kwargs.setdefault('chunk_size', 261120 * 2 * 2)
+        fs = gridfs.GridFS(self._db, collection=collection_name)
+        return fs.put(data, **kwargs)
+
+    def read_file(self, collection_name, query):
+        fs = gridfs.GridFS(self._db, collection=collection_name)
+        return [(f, f.metadata) for f in fs.find(query)]
 
     def _sanitize_attrs(self):
         """Sanitize attributes using MongoDB's 'uri_parser' module."""

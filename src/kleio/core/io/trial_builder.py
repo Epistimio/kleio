@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # pylint:disable=protected-access
 """
-:mod:`kleio.core.io.experiment_builder` -- Create experiment from user options
+:mod:`kleio.core.io.trial_builder` -- Create experiment from user options
 ==============================================================================
 
 .. module:: experiment
@@ -86,24 +86,26 @@ hierarchy. From the more global to the more specific, there is:
   argument to `kleio` itself as well as the user's script name and its arguments.
 
 """
+from collections import OrderedDict
 import copy
 import logging
 
 from kleio.core.io import resolve_config
+from kleio.core.io.cmdline_parser import CmdlineParser
 from kleio.core.io.database import Database, DuplicateKeyError
-from kleio.core.worker.experiment import Experiment, ExperimentView
+from kleio.core.evc.trial_node import TrialNode
 
 
 log = logging.getLogger(__name__)
 
 
-class ExperimentBuilder(object):
+class TrialBuilder(object):
     """Builder for :class:`kleio.core.worker.experiment.Experiment`
     and :class:`kleio.core.worker.experiment.ExperimentView`
 
     .. seealso::
 
-        `kleio.core.io.experiment_builder` for more information on the process of building
+        `kleio.core.io.trial_builder` for more information on the process of building
         experiments.
 
         :class:`kleio.core.worker.experiment.Experiment`
@@ -124,33 +126,80 @@ class ExperimentBuilder(object):
         """Get dictionary of options from configuration file provided in command-line"""
         return resolve_config.fetch_config(cmdargs)
 
-    def fetch_config_from_db(self, cmdargs):
-        """Get dictionary of options from experiment found in the database
-
-        Note
-        ----
-            This method builds an experiment view in the background to fetch the configuration from
-            the database.
-        """
-        try:
-            experiment_view = self.build_view_from(cmdargs)
-        except ValueError as e:
-            if "No experiment with given name" in str(e):
-                return {}
-            raise
-
-        return experiment_view.configuration
-
     def fetch_metadata(self, cmdargs):
         """Infer rest information about the process + versioning"""
         return resolve_config.fetch_metadata(cmdargs)
+
+    def fetch_command_config(self, commandline):
+
+        if not commandline:
+            return {}
+
+        cmdline_parser = CmdlineParser()
+        return cmdline_parser.parse(commandline)
+
+        positional_index = 0
+        argument_name = None
+        # todo: resort alphabetically to that reordering of commandline fits to same trial.
+        configuration = OrderedDict()
+        for arg in commandline:
+            if arg.startswith("-"):
+                argument_name = arg.lstrip("-")
+                configuration[argument_name] = []
+            elif argument_name is not None:
+                configuration[argument_name].append(arg)
+            else:
+                configuration["_{}".format(positional_index)] = arg
+                positional_index += 1
+
+        for key, value in list(configuration.items()):
+            if isinstance(value, list) and len(value) == 1:
+                configuration[key] = value[0]
+
+        return configuration
+
+    # ID is defined by trial hash-code
+    # If id not in db, start from scratch
+    # if --force-no-new, crash (fresh trials can be initiated with kleio save)
+    # kleio [-p project name] save [script] [args|]
+    #      save VCS, commandline, configuration file and comment
+    # kleio [-p project name] exec [trial_name]
+    #      save host info, stdout/err and bookkeeping (status, timestamps, etc)
+    # kleio [-p project name] branch [--copy] [trial_name] [args|]
+    #      copy config of [trial_name] by only modifying given args
+    #      If --copy, copy all artifacts and metrics logged so far. Trial can be continued from this
+    #      point if script supports resuming.
+    #      (possible to add, but not to remove)
+    #      (support config file, if args passed in cmd but was in config file, redirect it
+    #       accordingly)
+    #      (verify consistency of VCS)
+    # kleio [-p project name] [script] [args|]
+    #      like `kleio exec` but pass entire cmdline
+    # kleio [-p project name] status
+    # kleio list
+    # kleio info [project_name | trial_hash]
+
+    # kleio -p lr_schedule save -n first python main.py --lr 0.1 --epochs 10
+    # kleio exec first
+
+    # kleio branch --copy first -n second --lr 0.01 --epochs 20
+    # kleio branch --copy second --lr 0.001 --epochs 30
+
+    # kleio branch --copy first -n second_half--lr 0.05 --epochs 20
+    # kleio branch --copy second_half --lr 0.01 --epochs 30
+
+    # kleio -p lr_schedule status
+
+    # kleio python main.py --lr 0.1 --epochs 10
+
+    # kleio.client.wrap_argparser
 
     def fetch_full_config(self, cmdargs, use_db=True):
         """Get dictionary of the full configuration of the experiment.
 
         .. seealso::
 
-            `kleio.core.io.experiment_builder` for more information on the hierarchy of
+            `kleio.core.io.trial_builder` for more information on the hierarchy of
             configurations.
 
         Parameters
@@ -168,35 +217,18 @@ class ExperimentBuilder(object):
         """
         default_options = self.fetch_default_options()
         env_vars = self.fetch_env_vars()
-        if use_db:
-            config_from_db = self.fetch_config_from_db(cmdargs)
-        else:
-            config_from_db = {}
         cmdconfig = self.fetch_file_config(cmdargs)
-        metadata = dict(metadata=self.fetch_metadata(cmdargs))
+        metadata = self.fetch_metadata(cmdargs)
 
-        exp_config = resolve_config.merge_configs(
-            default_options, env_vars, copy.deepcopy(config_from_db), cmdconfig, cmdargs, metadata)
+        trial_config = resolve_config.merge_configs(
+            default_options, env_vars, cmdconfig, cmdargs, metadata)
 
-        # TODO: Find a better solution
-        if isinstance(exp_config['algorithms'], dict) and len(exp_config['algorithms']) > 1:
-            for key in list(config_from_db['algorithms'].keys()):
-                exp_config['algorithms'].pop(key)
+        trial_config['configuration'] = self.fetch_command_config(metadata['commandline'])
 
-        return exp_config
+        return trial_config
 
-    def build_view_from(self, cmdargs):
-        """Build an experiment view based on full configuration.
-
-        .. seealso::
-
-            `kleio.core.io.experiment_builder` for more information on the hierarchy of
-            configurations.
-
-            :class:`kleio.core.worker.experiment.ExperimentView` for more information on the
-            experiment view object.
-        """
-        local_config = self.fetch_full_config(cmdargs, use_db=False)
+    def build_database(self, cmdargs):
+        local_config = self.fetch_full_config(cmdargs)
 
         db_opts = local_config['database']
         dbtype = db_opts.pop('type')
@@ -207,25 +239,36 @@ class ExperimentBuilder(object):
         # Information should be enough to infer experiment's name.
         log.debug("Creating %s database client with args: %s", dbtype, db_opts)
         try:
-            Database(of_type=dbtype, **db_opts)
+            database = Database(of_type=dbtype, **db_opts)
         except ValueError:
             if Database().__class__.__name__.lower() != dbtype.lower():
                 raise
 
-        exp_name = local_config['name']
-        if exp_name is None:
-            raise RuntimeError("Could not infer experiment's name. "
-                               "Please use either `name` cmd line arg or provide "
-                               "one in kleio's configuration file.")
+        return database
 
-        return ExperimentView(local_config["name"])
+    def build_view_from(self, cmdargs):
+        """Build an experiment view based on full configuration.
+
+        .. seealso::
+
+            `kleio.core.io.trial_builder` for more information on the hierarchy of
+            configurations.
+
+            :class:`kleio.core.worker.experiment.ExperimentView` for more information on the
+            experiment view object.
+        """
+        local_config = self.fetch_full_config(cmdargs)
+        self.build_database(cmdargs)
+
+        trial = TrialNode.build(**local_config)
+        return TrialNode.view(trial.id)
 
     def build_from(self, cmdargs):
         """Build a fully configured (and writable) experiment based on full configuration.
 
         .. seealso::
 
-            `kleio.core.io.experiment_builder` for more information on the hierarchy of
+            `kleio.core.io.trial_builder` for more information on the hierarchy of
             configurations.
 
             :class:`kleio.core.worker.experiment.Experiment` for more information on the experiment
@@ -235,38 +278,32 @@ class ExperimentBuilder(object):
 
         log.info(full_config)
 
-        try:
-            experiment = self.build_from_config(full_config)
-        except DuplicateKeyError:
-            # Fails if concurrent experiment with identical (name, metadata.user)
-            # is written first in the database.
-            # Next build_from(cmdargs) should either load experiment from database
-            # and run smoothly if identical or trigger an experiment fork.
-            # In other words, there should not be more than 1 level of recursion.
-            experiment = self.build_from(cmdargs)
-
-        return experiment
+        # Raise DuplicateKeyError if concurrent trial with identical id
+        # is written first in the database.
+        return self.build_from_config(full_config)
 
     def build_from_config(self, config):
         """Build a fully configured (and writable) experiment based on full configuration.
 
         .. seealso::
 
-            `kleio.core.io.experiment_builder` for more information on the hierarchy of
+            `kleio.core.io.trial_builder` for more information on the hierarchy of
             configurations.
 
             :class:`kleio.core.worker.experiment.Experiment` for more information on the experiment
             object.
         """
+        self.build_database(config)
+
         log.info(config)
 
         # Pop out configuration concerning databases and resources
         config.pop('database', None)
         config.pop('resources', None)
+        config.pop('debug', None)
 
-        experiment = Experiment(config['name'])
+        config.setdefault('refers', None)
 
-        # Finish experiment's configuration and write it to database.
-        experiment.configure(config)
-
-        return experiment
+        # Raise DuplicateKeyError if concurrent trial with identical id
+        # is written first in the database.
+        return TrialNode.build(**config)

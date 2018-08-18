@@ -31,15 +31,21 @@ precedence is respected when building the settings dictionary:
 .. note:: `Optimization` entries are required, `Dynamic` entry is optional.
 
 """
+import bson
 import getpass
 import logging
 import os
+import platform
 import socket
+import subprocess
+import xml.etree.ElementTree
 
 from numpy import inf as infinity
 import yaml
 
 import kleio
+from kleio.core.utils import sorteddict
+from kleio.core.io.cmdline_parser import CmdlineParser
 
 
 def is_exe(path):
@@ -52,10 +58,6 @@ log = logging.getLogger(__name__)
 ################################################################################
 #                 Default Settings and Environmental Variables                 #
 ################################################################################
-
-# Default settings for command line arguments (option, description)
-DEF_CMD_MAX_TRIALS = (infinity, 'inf/until preempted')
-DEF_CMD_POOL_SIZE = (10, str(10))
 
 DEF_CONFIG_FILES_PATHS = [
     os.path.join(kleio.core.DIRS.site_data_dir, 'kleio_config.yaml.example'),
@@ -102,12 +104,6 @@ def fetch_default_options():
 
     """
     default_config = dict()
-
-    # get some defaults
-    default_config['name'] = None
-    default_config['max_trials'] = DEF_CMD_MAX_TRIALS[0]
-    default_config['pool_size'] = DEF_CMD_POOL_SIZE[0]
-    default_config['algorithms'] = 'random'
 
     # get default options for some managerial variables (see :const:`ENV_VARS`)
     for signifier, env_vars in ENV_VARS.items():
@@ -160,21 +156,24 @@ def fetch_metadata(cmdargs):
     """Infer rest information about the process + versioning"""
     metadata = {}
 
-    metadata['kleio_version'] = kleio.core.__version__
-
     # Move 'user_args' to 'metadata' key
-    user_args = cmdargs.get('user_args', [])
+    metadata['commandline'] = fetch_cmdline(cmdargs)
 
-    # Trailing white space are catched by argparse as an empty argument
-    if len(user_args) == 1 and user_args[0] == '':
-        user_args = []
+    # metadata['user'] = getpass.getuser()
 
-    if user_args:
-        metadata['user_args'] = user_args[1:]
+    metadata['host'] = fetch_host_info(cmdargs)
+    metadata['version'] = infer_versioning_metadata(cmdargs)
 
-    metadata['user'] = getpass.getuser()
+    return metadata
 
-    return infer_versioning_metadata(metadata)
+
+def fetch_cmdline(cmdargs):
+    if 'commandline' not in cmdargs:
+        return None
+
+    cmdline_parser = CmdlineParser()
+    configuration = cmdline_parser.parse(cmdargs['commandline'])
+    return cmdline_parser.format(configuration).split(" ")
 
 
 def merge_configs(*configs):
@@ -236,4 +235,88 @@ def infer_versioning_metadata(existing_metadata):
     # VCS system
     # User repo's version
     # User repo's HEAD commit hash
-    return existing_metadata
+    return {}
+
+
+def fetch_host_info(config):
+    host_info = sorteddict()
+    host_info['CPUs'] = fetch_cpus_info()
+    host_info['GPUs'] = fetch_gpus_info()
+    host_info['platform'] = fetch_platform_info()
+    host_info['env_vars'] = fetch_host_env_vars(config)
+    host_info['user'] = getpass.getuser()
+
+    return host_info
+
+
+def fetch_cpus_info():
+    cpus_info = sorteddict()
+    lscpu_output = subprocess.check_output("lscpu", shell=True).strip().decode()
+
+    for line in lscpu_output.split("\n"):
+        items = line.split(":")
+        cpus_info[items[0]] = ":".join(item.strip(' \t') for item in items[1:])
+
+    cpus_info.pop('CPU MHz', None)
+
+    return cpus_info
+
+
+def fetch_platform_info():
+
+    platform_info = sorteddict()
+    platform_info['kleio_version'] = kleio.core.__version__
+
+    for key in list(sorted(platform.__dict__.keys())):
+        if key.startswith('_'):
+            continue
+
+        item = getattr(platform, key)
+
+        if callable(item):
+            try:
+                item = item()
+            except BaseException as e:
+                log.debug("Cannot call platform.{}: {}".format(key, str(e)))
+
+        if not callable(item):
+            try:
+                bson.BSON.encode(dict(a=item))
+            except bson.errors.InvalidDocument as e:
+                if "Cannot encode" not in str(e):
+                    raise
+            else:
+                platform_info[key] = item
+
+    return platform_info 
+
+
+def fetch_host_env_vars(config):
+    host_env_vars = sorteddict()
+    for env_var in config.get('host_env_vars', ['CLUSTER']):
+        host_env_vars[env_var] = os.environ.get(env_var, None)
+
+    return host_env_vars
+
+
+def fetch_gpus_info():
+    gpus_info = sorteddict()
+
+    try:
+        nvidia_xml = subprocess.check_output(['nvidia-smi', '-q', '-x']).decode()
+    except (FileNotFoundError, OSError, subprocess.CalledProcessError):
+        return {}
+
+    for child in xml.etree.ElementTree.fromstring(nvidia_xml):
+        if child.tag == 'driver_version':
+            gpus_info['driver_version'] = child.text
+        if child.tag != 'gpu':
+            continue
+        gpu = sorteddict((
+            ('model', child.find('product_name').text),
+            ('total_memory', (child.find('fb_memory_usage').find('total').text)),
+            ('persistence_mode', (child.find('persistence_mode').text == 'Enabled'))
+        ))
+        gpus_info[child.attrib['id'].replace(".", ",")] = gpu
+
+    return gpus_info

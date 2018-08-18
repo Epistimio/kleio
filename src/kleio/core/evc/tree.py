@@ -230,7 +230,7 @@ class TreeNode(object):
         .. seealso::
             `kleio.core.evc.tree.TreeNode.drop_parent`
         """
-        if node is self.parent:
+        if node is self._parent:
             return
 
         if node is not None and not isinstance(node, TreeNode):

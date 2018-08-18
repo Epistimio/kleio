@@ -12,8 +12,10 @@ from abc import ABCMeta
 from collections import defaultdict
 from glob import glob
 from importlib import import_module
+import copy
 import logging
 import os
+import types
 
 import pkg_resources
 
@@ -146,3 +148,81 @@ class SingletonFactory(AbstractSingletonType, Factory):
     """Wrapping `Factory` with `SingletonType`. Keep compatibility with `AbstractSingletonType`."""
 
     pass
+
+
+
+def sorteddict(*items):
+    if len(items) == 0:
+        return SortedDict()
+
+    if len(items) == 1:
+        return _sorteddict(items[0])
+
+    return [_sorteddict(item) for item in items]
+
+
+def _sorteddict(item):
+
+    if isinstance(item, dict):
+        return SortedDict(item)
+
+    if isinstance(item, (tuple, list)):
+        return [_sorteddict(subitem) for subitem in item]
+
+    if isinstance(item, types.GeneratorType):
+        return (_sorteddict(subitem) for subitem in item)
+
+    return item
+
+
+class SortedDict(dict):
+    def keys(self):
+        return sorted(super(SortedDict, self).keys())
+
+    def items(self):
+        return ((key, self[key]) for key in self.keys())
+
+    def values(self):
+        return (self[key] for key in self.keys())
+
+    def __getitem__(self, key):
+        return sorteddict(super(SortedDict, self).__getitem__(key))
+
+    def __str__(self):
+        return "{{{}}}".format(", ".join("{}: {}".format(k, v) for k, v in self.items()))
+
+
+def flatten(dictionary):
+    def _flatten(dictionary):
+        if dictionary == {}:
+            return dictionary
+
+        key, value = dictionary.popitem()
+        if not isinstance(value, dict) or not value:
+            new_dictionary = {key: value}
+            new_dictionary.update(_flatten(dictionary))
+            return new_dictionary
+
+        flat_sub_dictionary = _flatten(value)
+        for flat_sub_key in list(flat_sub_dictionary.keys()):
+            flat_key = key + '.' + flat_sub_key
+            flat_sub_dictionary[flat_key] = flat_sub_dictionary.pop(flat_sub_key)
+
+        new_dictionary = flat_sub_dictionary
+        new_dictionary.update(flatten(dictionary))
+        return new_dictionary
+
+    return _flatten(copy.deepcopy(dictionary))
+
+
+def unflatten(dictionary):
+    unflattened_dictionary = dict()
+    for key, value in dictionary.items():
+        parts = key.split(".")
+        sub_dictionary = unflattened_dictionary
+        for part in parts[:-1]:
+            if part not in sub_dictionary:
+                sub_dictionary[part] = dict()
+            sub_dictionary = sub_dictionary[part]
+        sub_dictionary[parts[-1]] = value
+    return unflattened_dictionary

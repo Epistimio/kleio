@@ -208,6 +208,14 @@ class AbstractDB(object, metaclass=AbstractSingletonType):
         """
         pass
 
+    @abstractmethod
+    def write_file(self, collection_name, data, **kwargs):
+        pass
+
+    @abstractmethod
+    def read_file(self, collection_name, query):
+        pass
+
 
 # pylint: disable=too-few-public-methods
 class ReadOnlyDB(object):
@@ -225,7 +233,7 @@ class ReadOnlyDB(object):
                         # Properties
                         ["is_connected"] +
                         # Methods
-                        ["initiate_connection", "close_connection", "read", "count"])
+                        ["initiate_connection", "close_connection", "read", "count", "read_file"])
 
     def __init__(self, database):
         """Init method, see attributes of :class:`AbstractDB`."""
