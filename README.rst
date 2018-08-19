@@ -2,67 +2,208 @@
 Kleiṓ
 ******
 
-.. image:: https://travis-ci.org/mila-udem/kleio.svg?branch=master
-   :target: https://travis-ci.org/mila-udem/kleio
+.. image:: https://travis-ci.org/bouthilx/kleio.svg?branch=master
+   :target: https://travis-ci.org/bouthilx/kleio
 
-.. image:: https://codecov.io/gh/mila-udem/kleio/branch/master/graphs/badge.svg?branch=master
-   :target: https://codecov.io/gh/mila-udem/kleio
+.. image:: https://codecov.io/gh/bouthilx/kleio/branch/master/graphs/badge.svg?branch=master
+   :target: https://codecov.io/gh/bouthilx/kleio
 
-Kleiṓ is an asynchronous framework for black-box function optimization.
+Kleiṓ is an experiment manager, a logging journal of all data describing your
+experiments.
 
-Its purpose is to serve as a meta-optimizer for machine learning models
-and training, as well as a flexible experimentation
-platform for large scale asynchronous optimization procedures.
+Its purpose is to provide an automatic tool to log extensive environment
+information, including script's code version, system specification and script
+configuration. The logging journal can include statistics manually logged
+from within the user's script as well as artifacts and ressources. 
 
-Core design value is the minimum disruption of a researcher's workflow.
-It allows fast and efficient tuning, providing minimum simple non-intrusive
-(not even necessary!) helper *client* interface for a user's script.
-
-So if ``./run.py --mini-batch=50`` looks like what you execute normally,
-now what you have to do looks like this:
-
-``kleio -n experiment_name ./run.py --mini-batch~'randint(32, 256)'``
-
-Check out `user's guide-101`_ for the simplest of demonstrations!
-
-.. _user's guide-101: https://kleio.readthedocs.io/en/latest/user/executing.html
+It assumes the computation is entirely deterministic, and if not
+deterministic then one of the argument is a seed that makes it fully
+reproducible.
 
 Features
 ========
 *As simple and as complex you want*
 
-- Simple and natural, but also explicit and verbose, search domain definitions
-- Minimal and non-intrusive client interface for reporting
-  target function values
+- Simple and natural
+- Minimal and non-intrusive client interface for logging
 - Database logging (currently powered by MongoDB_)
 - Flexible configuration
-- Explicit experiment termination conditions
-- Algorithms algorithms algorithms:
-  Skopt_'s bayesian optimizers are at hand without writing.
-  Random search is the default.
-  **only** a single line of code.
-- More algorithms:
-  Implementing and distributing algorithms is as easy as possible!
-  Check `developer's guide-101`_. Expect algorithm plugins to pop out quickly!
-- Came up with an idea?
-  Your intuition is still at play:
-  Help your optima hunter now by a command line interface.
-- And other many more already there or coming soon!
+- Automatic detection of code or environment change on script resuming
+- Support branching experiments to avoid recomputation and minimize log journal
+  size
+- Inuitive and flexible interface for retrieval and navigation of statistics
 
 .. _MongoDB: https://www.mongodb.com/
-.. _Skopt: https://scikit-optimize.github.io/
-.. _developer's guide-101: https://kleio.readthedocs.io/en/latest/developer/testing.html
 
 Installation
 ============
 
-Install Kleiṓ (beta) by running:
+Install Kleiṓ (prototype) by running:
 
-``pip install git+https://github.com/mila-udem/kleio.git@master``
+``pip install git+https://github.com/bouthilx/kleio.git@prototype``
+
+Getting started
+===============
 
 For more information read the `full installation docs`_.
 
 .. _full installation docs: https://kleio.readthedocs.io/en/latest/installing.html
+
+Configuring the database
+------------------------
+
+TODO
+
+Executing a command
+-------------------
+
+Suppose you would execute your command the following way
+
+.. code:: bash
+
+   $ python myscript.py one_pos_arg --some arguments --and some more
+
+To log your execution with Kleiṓ, you simply need to prepend the command
+`kleio` at the beginning of the commandline.
+
+.. code:: bash
+    
+    $ kleio python myscript.py one_pos_arg --some arguments --and some more
+    > trial reserved with id: <some-id-string>
+
+You can resume the script by running the same command again or by specifing the
+id of the trial.
+
+.. code:: bash
+
+    $ kleio run <some-id-string>
+
+Since Kleiṓ is multiprocess safe, trying to execute the same command
+twice concurrently will raise an error.
+
+.. code:: bash
+
+    $ kleio run <some-id-string>
+    > TODO: Error message
+
+To allow resuming execution even though the code or the system changed, you
+can use the options --allow-code-change, --allow-env-change or
+--allow-any-change. In order to ensure full reproducibility, the trial will
+actually be branched. The timestamp of branching will be marked in the trial
+configuration, so that the change of code or environement can be tracked. Note
+that since the trial has been branched, the original one can still be resumed
+using the original code version in the original environement. This makes it
+possible to compare the effect of code change or environment change.
+
+.. code:: bash
+
+     $ kleio run --allow-any-change python myscript.py one_pos_arg --some arguments --and some more
+
+or
+
+.. code:: bash
+
+    $ kleio run --allow-any-change <some-id-string>
+
+Logging
+-------
+
+Statistics
+~~~~~~~~~~
+
+``log_statistic(**kwargs)``
+
+The method is built such that it will turn whatever is passed to it into a dictionary.
+Note that you cannot log using positional attributes, you must use named attributes.
+This is because the log would be meaningless if we would provide unnamed values.
+Statistics can be retrieved from a trial and sorted with respect to any possible key in the log.
+Thanks to this, there is no specific timestamp field, and any key such as ``epoch```, ``iteration`` 
+or `loss` could be used to sort statistics when analysing a trial.
+
+.. code:: python
+ 
+    from kleio.client.logger import kleio_logger
+    
+    kleio_logger.log_statistic(some_time='some time', some_value='some value')
+    kleio_logger.log_statistic(some_time='some other time', some_value='some other value')
+    
+Note that a script using ``kleio_logger.log_statistic`` can be executed without ``kleio``.
+In such case, the method will only print the logged statistics in terminal, without saving it
+in any database.
+
+Artifacts
+~~~~~~~~~
+
+``log_artifact(filename, artifact, **kwargs)``
+
+Artifacts are logged in a similar fashion as for statistics, with the slight difference that 
+a filename and a file-like object must be passed. Any other named arguments are saved as 
+metadata for the artifact. This metadata is particularly usefull when retrieving artifacts based
+on special keys, such as fetching ``'weights'`` for ``epoch=10``.
+
+.. code:: python
+ 
+    from kleio.client.logger import kleio_logger
+
+    kleio_logger.log_artifact('some_file_path', some_file_like_object,
+                              some_time='some time', some_value='some other value')
+
+Ressources
+~~~~~~~~~~
+
+Ressources are not supported yet, but will have a very similar interface as for artifacts.
+
+Reading
+-------
+
+Cat
+~~~
+
+.. code:: bash
+
+    $ kleio cat <some-id-string>
+
+Tail
+~~~~
+
+.. code:: bash
+
+    $ kleio tail -f <some-id-string>
+
+Info
+~~~~
+
+.. code:: bash
+
+    $ kleio info <some-id-string>
+
+PDB
+~~~
+
+.. code:: bash
+
+    $ kleio pdb <some-id-string>
+    
+    
+List
+~~~~
+
+.. code:: bash
+
+    $ kleio ls
+
+Branching
+---------
+
+.. code:: bash
+
+    $ kleio branch <some-id-string> --some new-argument-value --new argument
+
+Note that positional arguments cannot be updated by Kleiṓ when branching.
+
+.. code:: bash
+
+    $ kleio branch --timestamp epoch=10 <some-id-string>
 
 Contribute or Ask
 =================
@@ -71,8 +212,8 @@ Do you have a question or issues?
 Do you want to report a bug or suggest a feature? Name it!
 Please contact us by opening an issue in our repository below:
 
-- Issue Tracker: `<github.com/mila-udem/kleio/issues>`_
-- Source Code: `<github.com/mila-udem/kleio>`_
+- Issue Tracker: `<github.com/bouthilx/kleio/issues>`_
+- Source Code: `<github.com/bouthilx/kleio>`_
 
 Start by starring and forking our Github repo!
 
