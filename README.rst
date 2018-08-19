@@ -45,10 +45,6 @@ Install Kleiṓ (prototype) by running:
 Getting started
 ===============
 
-For more information read the `full installation docs`_.
-
-.. _full installation docs: https://kleio.readthedocs.io/en/latest/installing.html
-
 Configuring the database
 ------------------------
 
