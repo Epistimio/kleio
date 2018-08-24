@@ -2,11 +2,19 @@
 Kleiṓ
 ******
 
-.. image:: https://travis-ci.org/bouthilx/kleio.svg?branch=master
-   :target: https://travis-ci.org/bouthilx/kleio
+------------------------------
+Note that this is a prototype. 
+------------------------------
 
-.. image:: https://codecov.io/gh/bouthilx/kleio/branch/master/graphs/badge.svg?branch=master
-   :target: https://codecov.io/gh/bouthilx/kleio
+Functionalities are not well tested and interface is very likely to change.
+
+-----
+
+.. image:: https://travis-ci.org/epistimio/kleio.svg?branch=master
+   :target: https://travis-ci.org/epistimio/kleio
+
+.. image:: https://codecov.io/gh/epistimio/kleio/branch/master/graphs/badge.svg?branch=master
+   :target: https://codecov.io/gh/epistimio/kleio
 
 Kleiṓ is an experiment manager, a logging journal of all data describing your
 experiments.
@@ -40,7 +48,7 @@ Installation
 
 Install Kleiṓ (prototype) by running:
 
-``pip install git+https://github.com/bouthilx/kleio.git@prototype``
+``pip install git+https://github.com/epistimio/kleio.git@prototype``
 
 Getting started
 ===============
@@ -208,8 +216,8 @@ Do you have a question or issues?
 Do you want to report a bug or suggest a feature? Name it!
 Please contact us by opening an issue in our repository below:
 
-- Issue Tracker: `<github.com/bouthilx/kleio/issues>`_
-- Source Code: `<github.com/bouthilx/kleio>`_
+- Issue Tracker: `<github.com/epistimio/kleio/issues>`_
+- Source Code: `<github.com/epistimio/kleio>`_
 
 Start by starring and forking our Github repo!
 
