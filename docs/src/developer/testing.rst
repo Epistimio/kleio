@@ -16,17 +16,17 @@ Continuous Integration
 
 We use **TravisCI** and **CodeCov**.
 
-.. image:: https://travis-ci.org/mila-udem/kleio.svg?branch=master
-   :target: https://travis-ci.org/mila-udem/kleio
+.. image:: https://travis-ci.org/epistimio/kleio.svg?branch=master
+   :target: https://travis-ci.org/epistimio/kleio
 
-.. image:: https://codecov.io/gh/mila-udem/kleio/branch/master/graphs/badge.svg?branch=master
-   :target: https://codecov.io/gh/mila-udem/kleio
+.. image:: https://codecov.io/gh/epistimio/kleio/branch/master/graphs/badge.svg?branch=master
+   :target: https://codecov.io/gh/epistimio/kleio
 
 Continuous Testing
 ==================
 
 Using ``tox`` we can automate many processes of continuous testing into macros.
-All contexts are defined in `/tox.ini <https://github.com/mila-udem/kleio/blob/master/tox.ini>`_.
+All contexts are defined in `/tox.ini <https://github.com/epistimio/kleio/blob/master/tox.ini>`_.
 
 By calling::
 

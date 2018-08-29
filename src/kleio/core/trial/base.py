@@ -43,7 +43,7 @@ _NO_FIRST_ITEM = object()
 COMMANDLINE_HASHING_ERROR = """
 Commandline is used in hashing, so it should not be possible to load
 a trial with a different commandline. Please report this error at
-https://github.com/mila-udem/kleio/issues with the following message.
+https://github.com/epistimio/kleio/issues with the following message.
 
 hash:
 {trial.hash_name}
@@ -56,7 +56,7 @@ Commandline from database:
 CONFIGURATION_HASHING_ERROR = """
 Configuration is used in hashing, so it should not be possible to load
 a trial with a different configuration. Please report this error at
-https://github.com/mila-udem/kleio/issues with the following message.
+https://github.com/epistimio/kleio/issues with the following message.
 
 hash:
 {trial.hash_name}
@@ -70,7 +70,7 @@ Configuration from database:
 CONFIGURATION_CORRUPTION_ERROR = """
 Current configuration hashing is different than the one saved in database.
 This is likely to be caused by a corruption of the configuration as it would change the hashing.
-Please report this error at https://github.com/mila-udem/kleio/issues with the following message.
+Please report this error at https://github.com/epistimio/kleio/issues with the following message.
 
 hash:
 {trial.hash_name}

@@ -59,7 +59,7 @@ Oríon configuration files.
       export ORION_DB_NAME=kleio_test
       export ORION_DB_TYPE=MongoDB
 
-   2. By creating a section in an Oríon's configuration YAML file, like `this one <https://github.com/mila-udem/kleio/blob/master/tests/functional/demo/kleio_config_random.yaml>`_
+   2. By creating a section in an Oríon's configuration YAML file, like `this one <https://github.com/epistimio/kleio/blob/master/tests/functional/demo/kleio_config_random.yaml>`_
       used by our functional tests.
 
    .. code-block:: yaml

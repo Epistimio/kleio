@@ -48,10 +48,10 @@ Fork and Pull Request
 =====================
 
 Fork Oríon remotely to your Github_ account now, and start by submitting a
-`Pull Request <https://github.com/mila-udem/kleio/pulls>`_ to us or by
-discussing an `issue <https://github.com/mila-udem/kleio/issues>`_ with us.
+`Pull Request <https://github.com/epistimio/kleio/pulls>`_ to us or by
+discussing an `issue <https://github.com/epistimio/kleio/issues>`_ with us.
 
-.. image:: https://img.shields.io/github/forks/mila-udem/kleio.svg?style=social&label=Fork
-   :target: https://github.com/mila-udem/kleio/network
+.. image:: https://img.shields.io/github/forks/epistimio/kleio.svg?style=social&label=Fork
+   :target: https://github.com/epistimio/kleio/network
 
 .. _Github: https://github.com

@@ -2,11 +2,31 @@
 Kleiṓ
 ******
 
-.. image:: https://travis-ci.org/bouthilx/kleio.svg?branch=master
-   :target: https://travis-ci.org/bouthilx/kleio
+|pypi| |py_versions| |license| |rtfd| |codecov| |travis|
 
-.. image:: https://codecov.io/gh/bouthilx/kleio/branch/master/graphs/badge.svg?branch=master
-   :target: https://codecov.io/gh/bouthilx/kleio
+.. |pypi| image:: https://img.shields.io/pypi/v/kleio.core.svg
+    :target: https://pypi.python.org/pypi/kleio.core
+    :alt: Current PyPi Version
+
+.. |py_versions| image:: https://img.shields.io/pypi/pyversions/kleio.core.svg
+    :target: https://pypi.python.org/pypi/kleio.core
+    :alt: Supported Python Versions
+
+.. |license| image:: https://img.shields.io/badge/License-BSD%203--Clause-blue.svg
+    :target: https://opensource.org/licenses/BSD-3-Clause
+    :alt: BSD 3-clause license
+
+.. |rtfd| image:: https://readthedocs.org/projects/kleio/badge/?version=latest
+    :target: https://kleio.readthedocs.io/en/latest/?badge=latest
+    :alt: Documentation Status
+
+.. |codecov| image:: https://codecov.io/gh/Epistimio/kleio/branch/master/graph/badge.svg
+    :target: https://codecov.io/gh/Epistimio/kleio
+    :alt: Codecov Report
+
+.. |travis| image:: https://travis-ci.org/Epistimio/kleio.svg?branch=master
+    :target: https://travis-ci.org/Epistimio/kleio
+    :alt: Travis tests
 
 Kleiṓ is an experiment manager, a logging journal of all data describing your
 experiments.

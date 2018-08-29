@@ -39,6 +39,6 @@ The Space Class
 
 TODO
 
-.. _gradient_descent_algo: https://github.com/mila-udem/kleio/tree/master/tests/functional/gradient_descent_algo
-.. _gradient_descent_algo_code: https://github.com/mila-udem/kleio/blob/master/tests/functional/gradient_descent_algo/src/kleio/algo/gradient_descent.py
+.. _gradient_descent_algo: https://github.com/epistimio/kleio/tree/master/tests/functional/gradient_descent_algo
+.. _gradient_descent_algo_code: https://github.com/epistimio/kleio/blob/master/tests/functional/gradient_descent_algo/src/kleio/algo/gradient_descent.py
 

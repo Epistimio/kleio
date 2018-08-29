@@ -11,7 +11,7 @@ fast and efficient hyperparameter tuning, and secondly to provide secondary APIs
 for more advanced features, such as dynamically reporting validation scores on
 training time for automatic early stopping or on-the-fly reconfiguration.
 
-Start by having a look here: https://github.com/mila-udem/kleio
+Start by having a look here: https://github.com/epistimio/kleio
 """
 from ._version import get_versions
 from .utils._appdirs import AppDirs
@@ -19,18 +19,13 @@ from .utils._appdirs import AppDirs
 VERSIONS = get_versions()
 del get_versions
 
-__descr__ = 'Asynchronous [black-box] Optimization'
+__descr__ = 'Automated experiment journaling'
 __version__ = VERSIONS['version']
 __license__ = 'BSD-3-Clause'
-__author__ = u'Oríon Team - MILA, Université de Montréal'
-__author_short__ = 'MILA'
-__author_email__ = 'lisa_labo@iro.umontreal.ca'
-__copyright__ = u'2017-2018, Oríon Team - MILA, Université de Montréal'
-__authors__ = {
-    'tsirif': ('Christos Tsirigotis', 'tsirif@gmail.com'),
-    'bouthilx': ('Xavier Bouthillier', 'xavier.bouthillier@gmail.com'),
-}
-__url__ = 'https://github.com/mila-udem/kleio'
+__author__ = u'Epistímio Team'
+__author_email__ = 'xavier.bouthillier@umontreal.ca'
+__copyright__ = u'2017-2018, Epistímio Team'
+__url__ = 'https://github.com/epistimio/kleio'
 
-DIRS = AppDirs(__name__, __author_short__)
+DIRS = AppDirs(__name__ )
 del AppDirs
