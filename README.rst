@@ -2,6 +2,14 @@
 Kleiṓ
 ******
 
+------------------------------
+Note that this is a prototype. 
+------------------------------
+
+Functionalities are not well tested and interface is very likely to change.
+
+-----
+
 |pypi| |py_versions| |license| |rtfd| |codecov| |travis|
 
 .. |pypi| image:: https://img.shields.io/pypi/v/kleio.core.svg
@@ -60,7 +68,7 @@ Installation
 
 Install Kleiṓ (prototype) by running:
 
-``pip install git+https://github.com/bouthilx/kleio.git@prototype``
+``pip install git+https://github.com/epistimio/kleio.git@prototype``
 
 Getting started
 ===============
@@ -228,8 +236,8 @@ Do you have a question or issues?
 Do you want to report a bug or suggest a feature? Name it!
 Please contact us by opening an issue in our repository below:
 
-- Issue Tracker: `<github.com/bouthilx/kleio/issues>`_
-- Source Code: `<github.com/bouthilx/kleio>`_
+- Issue Tracker: `<github.com/epistimio/kleio/issues>`_
+- Source Code: `<github.com/epistimio/kleio>`_
 
 Start by starring and forking our Github repo!
 
