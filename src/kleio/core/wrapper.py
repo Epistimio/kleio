@@ -17,7 +17,7 @@ import sys
 import tempfile
 import sys
 
-from kleio.core.trial import Trial
+from kleio.core.trial.base import Trial
 
 
 log = logging.getLogger(__name__)

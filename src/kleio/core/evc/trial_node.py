@@ -6,7 +6,7 @@ from kleio.core.trial.attribute import (
 from kleio.core.trial.base import Trial
 from kleio.core.utils import flatten, unflatten
 
-from kleio.core.trial.statistics import Statistics
+from kleio.core.trial.statistic import Statistics
 
 
 class TrialNode(TreeNode):
