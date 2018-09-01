@@ -8,7 +8,7 @@ def add_default_subparser(parser, name):
     run_parser = parser.add_parser(name, help='run help')
 
     run_parser.add_argument(
-        '--config',
+        '--config', type=argparse.FileType('r'),
         help=('Configuration file for Kleio'))
 
     run_parser.add_argument(
