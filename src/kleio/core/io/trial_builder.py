@@ -225,6 +225,9 @@ class TrialBuilder(object):
 
         trial_config['configuration'] = self.fetch_command_config(metadata['commandline'])
 
+        # Config has been turned into cmdconfig, pop it out of trial_config
+        trial_config.pop('config', None)
+
         return trial_config
 
     def build_database(self, cmdargs):
