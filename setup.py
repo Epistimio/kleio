@@ -49,7 +49,7 @@ setup_args = dict(
     version=versioneer.get_version(),
     cmdclass=versioneer.get_cmdclass(),
     description=kleio.__descr__,
-    long_description=open(os.path.join(repo_root, "README.rst")).read(),
+    long_description=open(os.path.join(repo_root, "README.rst"), 'rt', encoding='utf8').read(),
     license=kleio.__license__,
     author=kleio.__author__,
     author_email=kleio.__author_email__,
