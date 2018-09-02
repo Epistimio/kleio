@@ -67,18 +67,19 @@ DEF_CONFIG_FILES_PATHS = [
 
 # list containing tuples of
 # (environmental variable names, configuration keys, default values)
-ENV_VARS_DB = [
-    ('ORION_DB_NAME', 'name', 'kleio'),
-    ('ORION_DB_TYPE', 'type', 'MongoDB'),
-    ('ORION_DB_ADDRESS', 'host', socket.gethostbyname(socket.gethostname()))
-    ]
+ENV_VARS_DB = dict(
+    name=('KLEIO_DB_NAME', 'kleio'),
+    type=('KLEIO_DB_TYPE', 'MongoDB'),
+    host=('KLEIO_DB_ADDRESS', socket.gethostbyname(socket.gethostname()))
+    )
 
 # TODO: Default resource from environmental (localhost)
 
 # dictionary describing lists of environmental tuples (e.g. `ENV_VARS_DB`)
 # by a 'key' to be used in the experiment's configuration dict
 ENV_VARS = dict(
-    database=ENV_VARS_DB
+    database=ENV_VARS_DB,
+    debug=('KLEIO_DEBUG_MODE', 'false')
     )
 
 
@@ -106,10 +107,7 @@ def fetch_default_options():
     default_config = dict()
 
     # get default options for some managerial variables (see :const:`ENV_VARS`)
-    for signifier, env_vars in ENV_VARS.items():
-        default_config[signifier] = {}
-        for _, key, default_value in env_vars:
-            default_config[signifier][key] = default_value
+    default_config = fetch_env_vars(fetch_default=True)
 
     # fetch options from default configuration files
     for configpath in DEF_CONFIG_FILES_PATHS:
@@ -136,20 +134,23 @@ def fetch_default_options():
     return default_config
 
 
-def fetch_env_vars():
+def fetch_env_vars(env_vars=None, fetch_default=False):
     """Fetch environmental variables related to kleio's managerial data."""
-    env_vars = {}
+    if env_vars is None:
+        env_vars = ENV_VARS
 
-    for signif, evars in ENV_VARS.items():
-        env_vars[signif] = {}
+    config = {}
 
-        for var_name, key, _ in evars:
-            value = os.getenv(var_name)
+    for signif, evars in env_vars.items():
 
-            if value is not None:
-                env_vars[signif][key] = value
+        if isinstance(evars, dict):
+            config[signif] = fetch_env_vars(evars, fetch_default)
+        elif os.getenv(evars[0]) is not None:
+            config[signif] = os.getenv(evars[0])
+        elif fetch_default:
+            config[signif] = evars[1]
 
-    return env_vars
+    return config
 
 
 def fetch_metadata(cmdargs):

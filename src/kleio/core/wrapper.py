@@ -17,6 +17,7 @@ import sys
 import tempfile
 import sys
 
+from kleio.core.io.database import Database
 from kleio.core.trial.base import Trial
 
 
@@ -116,6 +117,10 @@ class Consumer(object):
         """Facilitate launching a black-box trial."""
         env = dict(os.environ)
         env['KLEIO_TRIAL_ID'] = trial.id
+        database = Database()
+        env['KLEIO_DB_NAME'] = database.name
+        env['KLEIO_DB_TYPE'] = database.__class__.__name__.lower()
+        env['KLEIO_DB_ADDRESS'] = database.host
 
         # Create the subprocess, redirect the standard output into a pipe
         loop = asyncio.get_event_loop()
