@@ -120,7 +120,7 @@ class Consumer(object):
         database = Database()
         env['KLEIO_DB_NAME'] = database.name
         env['KLEIO_DB_TYPE'] = database.__class__.__name__.lower()
-        env['KLEIO_DB_ADDRESS'] = database.host
+        env['KLEIO_DB_ADDRESS'] = database.uri  # TODO: Make it generic, this is only for mongodb
         level_to_verbose = {'WARNING': 0,
                             'INFO': 1,
                             'DEBUG': 2}
