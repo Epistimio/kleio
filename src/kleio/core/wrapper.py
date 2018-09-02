@@ -12,6 +12,7 @@ import asyncio
 import concurrent
 import logging
 import os
+import pprint
 import subprocess
 import sys
 import tempfile
@@ -127,6 +128,8 @@ class Consumer(object):
         env['KLEIO_VERBOSITY'] = str(
             level_to_verbose.get(
                 logging.getLevelName(logging.getLogger().getEffectiveLevel()), 2))
+
+        log.debug("Executing with env:\n{}".format(pprint.pformat(env)))
 
         # Create the subprocess, redirect the standard output into a pipe
         loop = asyncio.get_event_loop()

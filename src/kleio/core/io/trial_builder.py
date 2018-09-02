@@ -89,6 +89,7 @@ hierarchy. From the more global to the more specific, there is:
 from collections import OrderedDict
 import copy
 import logging
+import pprint
 
 from kleio.core.io import resolve_config
 from kleio.core.io.cmdline_parser import CmdlineParser
@@ -216,9 +217,13 @@ class TrialBuilder(object):
 
         """
         default_options = self.fetch_default_options()
+        log.debug("default options:\n{}".format(pprint.pformat(default_options)))
         env_vars = self.fetch_env_vars()
+        log.debug("env vars:\n{}".format(pprint.pformat(env_vars)))
         cmdconfig = self.fetch_file_config(cmdargs)
+        log.debug("cmdconfig:\n{}".format(pprint.pformat(cmdconfig)))
         metadata = self.fetch_metadata(cmdargs)
+        log.debug("metadata:\n{}".format(pprint.pformat(metadata)))
 
         trial_config = resolve_config.merge_configs(
             default_options, env_vars, cmdconfig, cmdargs, metadata)
@@ -228,12 +233,19 @@ class TrialBuilder(object):
         # Config has been turned into cmdconfig, pop it out of trial_config
         trial_config.pop('config', None)
 
+        log.debug("trial_config:\n{}".format(pprint.pformat(trial_config)))
+
         return trial_config
 
     def build_database(self, cmdargs):
         local_config = self.fetch_full_config(cmdargs)
 
+        log.debug("local config:\n{}".format(pprint.pformat(local_config)))
+
         db_opts = local_config['database']
+
+        log.debug("db config:\n{}".format(pprint.pformat(db_opts)))
+
         dbtype = db_opts.pop('type')
 
         if local_config.get("debug"):
