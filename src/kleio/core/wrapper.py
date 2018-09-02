@@ -118,7 +118,6 @@ class Consumer(object):
         """Facilitate launching a black-box trial."""
         env = dict(os.environ)
         env['KLEIO_TRIAL_ID'] = trial.id
-        env['KLEIO_DEBUG_MODE'] = 'True' if self.debug else ''
         database = Database()
         env['KLEIO_DB_NAME'] = database.name
         env['KLEIO_DB_TYPE'] = database.__class__.__name__.lower()
