@@ -121,6 +121,12 @@ class Consumer(object):
         env['KLEIO_DB_NAME'] = database.name
         env['KLEIO_DB_TYPE'] = database.__class__.__name__.lower()
         env['KLEIO_DB_ADDRESS'] = database.host
+        level_to_verbose = {'WARNING': 0,
+                            'INFO': 1,
+                            'DEBUG': 2}
+        env['KLEIO_VERBOSITY'] = str(
+            level_to_verbose.get(
+                logging.getLevelName(logging.getLogger().getEffectiveLevel()), 2))
 
         # Create the subprocess, redirect the standard output into a pipe
         loop = asyncio.get_event_loop()

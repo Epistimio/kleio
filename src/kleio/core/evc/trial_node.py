@@ -19,6 +19,9 @@ class TrialNode(TreeNode):
     @classmethod
     def load(cls, trial_id, interval=(None, None)):
         trial = Trial.load(trial_id, interval=interval)
+        if trial is None:
+            return None
+
         return TrialNode(trial_id, trial)
 
     @classmethod

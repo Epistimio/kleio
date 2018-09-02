@@ -15,7 +15,7 @@ import logging
 import pprint
 
 
-python_logger = logging.getLogger()
+python_logger = logging.getLogger(__name__)
 
 
 class Logger(object):
@@ -155,6 +155,7 @@ class RemoteFileWrapper(object):
 
 KLEIO_IS_ON = False
 KLEIO_TRIAL_ID = os.getenv('KLEIO_TRIAL_ID', None)
+KLEIO_VERBOSITY = int(os.getenv('KLEIO_VERBOSITY', 0))
 trial = None
 flatten = None
 unflatten = None
@@ -163,8 +164,15 @@ if KLEIO_TRIAL_ID:
     from kleio.core.io.trial_builder import TrialBuilder
     from kleio.core.evc.trial_node import TrialNode
     from kleio.core.utils import flatten, unflatten
-    TrialBuilder().build_database({})
+    levels = {0: logging.WARNING,
+              1: logging.INFO,
+              2: logging.DEBUG}
+    logging.basicConfig(level=levels.get(KLEIO_VERBOSITY, logging.DEBUG))
+    python_logger.debug("Initiating database inside user script")
+    TrialBuilder().build_database({})  # {'debug': KLEIO_DEBUG_MODE})
+    python_logger.debug("Initiating kleio logger inside user script")
     kleio_logger = Logger()
+    python_logger.debug("Trial {} loaded inside kleio logger".format(kleio_logger.trial.item.id))
     IS_ORION_ON = True
 else:
     kleio_logger = BackupLogger()
