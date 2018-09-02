@@ -76,8 +76,10 @@ class TrialNode(TreeNode):
         not done already.
         """
         if self._item is None:
-            print("loading view")
             self._item = Trial.view(self.id)
+            if self._item is None:
+                raise RuntimeError("Could not find trial {} in db".format(self.id))
+
             self._item._trial._node = self
 
         return self._item
@@ -97,7 +99,6 @@ class TrialNode(TreeNode):
             if self.item.refers['parent_id'] is not None:
                 trial_id = self.item.refers['parent_id']
                 timestamp = self.item.refers['timestamp']
-                print("loading parent view")
                 self.set_parent(TrialNode.view(trial_id, interval=(None, timestamp)))
 
         return self._parent
@@ -116,7 +117,6 @@ class TrialNode(TreeNode):
             self._no_children_lookup = False
             query = {'refers.parent_id': self.item.id}
             selection = {'_id': 1}
-            print("loading child view")
             trials = Database().read(self.item.trial_immutable_collection,
                                      query, selection=selection)
             for child in trials:
