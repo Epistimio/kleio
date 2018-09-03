@@ -79,7 +79,7 @@ ENV_VARS_DB = dict(
 # by a 'key' to be used in the experiment's configuration dict
 ENV_VARS = dict(
     database=ENV_VARS_DB,
-    debug=('KLEIO_DEBUG_MODE', 'false')
+    debug=('KLEIO_DEBUG_MODE', False)
     )
 
 
