@@ -72,6 +72,9 @@ def main(args):
         raise SystemExit(DUPLICATE_ERROR_MESSAGE.format(trial=trial))
 
     for tag in tags.split(";"):
+        if not tag:
+            continue
+
         if tag not in trial._tags.get():
             trial._tags.append(tag)
 

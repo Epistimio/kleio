@@ -28,6 +28,12 @@ def main(args):
         for trial in trials:
             print(trial['_id'])
         sys.exit(0)
+    elif len(trials) == 0:
+        print("Trial {} not found in db".format(args['id']))
+        trials = database.read(Trial.trial_immutable_collection, {}, {'_id': 1})
+        print([trial['_id'] for trial in trials])
+        import sys
+        sys.exit(0)
 
     trial = TrialNode.view(trials[0]['_id'])
     import pdb
