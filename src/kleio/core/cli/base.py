@@ -82,7 +82,7 @@ argparse.ArgumentParser.set_default_subparser = set_default_subparser
 
 
 class KleioArgsParser:
-    """Parser object handling the upper-level parsing of Oríon's arguments."""
+    """Parser object handling the upper-level parsing of Kleio's arguments."""
 
     def __init__(self, description=CLI_DOC_HEADER):
         """Create the pre-command arguments"""
@@ -134,20 +134,39 @@ class KleioArgsParser:
 def get_basic_args_group(parser):
     """Return the basic arguments for any command."""
     basic_args_group = parser.add_argument_group(
-        "Oríon arguments (optional)",
+        "Kleio arguments (optional)",
         description="These arguments determine kleio's behaviour")
-
-    basic_args_group.add_argument(
-        '-n', '--name',
-        type=str, metavar='stringID',
-        help="experiment's unique name; "
-             "(default: None - specified either here or in a config)")
 
     basic_args_group.add_argument('-c', '--config', type=argparse.FileType('r'),
                                   metavar='path-to-config', help="user provided "
                                   "kleio configuration file")
 
     return basic_args_group
+
+
+def get_version_args_group(parser):
+
+    version_group = parser.add_argument_group(
+        "Execution version related arguments",
+        description="These argument determine automated branching or version conflicts.")
+
+    version_group.add_argument(
+        '--allow-code-change', action='store_true',
+        help="")
+
+    version_group.add_argument(
+        '--allow-version-change', action='store_true',
+        help="")
+
+    version_group.add_argument(
+        '--allow-host-change', action='store_true',
+        help="")
+
+    version_group.add_argument(
+        '--allow-any-change', action='store_true',
+        help="")
+
+    return version_group
 
 
 def get_user_args_group(parser):
@@ -161,7 +180,7 @@ def get_user_args_group(parser):
                     "and they can serve as kleio's parameter declaration.")
 
     usergroup.add_argument(
-        'user_args', nargs=argparse.REMAINDER, metavar='...',
+        'commandline', nargs=argparse.REMAINDER, metavar='...',
         help="Command line of user script. A configuration "
              "file intended to be used with 'userscript' must be given as a path "
              "in the **first positional** argument OR using `--config=<path>` "

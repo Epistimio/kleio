@@ -27,6 +27,9 @@ class TrialNode(TreeNode):
     @classmethod
     def view(cls, trial_id, interval=(None, None)):
         trial = Trial.view(trial_id, interval=interval)
+        if trial is None:
+            return None
+
         return TrialNode(trial_id, trial)
 
     @classmethod
@@ -55,6 +58,16 @@ class TrialNode(TreeNode):
         commandline = cmdline_parser.format(configuration)
         kwargs['commandline'] = commandline.split(" ")
         branch = Trial(**kwargs)
+
+        # Will fail if already branched
+        if parent_node.host is None or parent_node.version is None:
+            parent_node.branch()
+
+        try:
+            branch.save()
+        except DuplicateKeyError as e:
+            parent_node.broken()
+            raise RuntimeError("Branch already exist with id '{trial.id}'".format(branch)) from e
 
         return TrialNode(branch.id, branch, parent=parent_node)
 

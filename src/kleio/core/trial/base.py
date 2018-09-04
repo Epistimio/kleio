@@ -182,14 +182,15 @@ class Trial(object):
     """
 
     @classmethod
-    def build(cls, interval=(None, None), **kwargs):
+    def build(cls, interval=(None, None), local=False, **kwargs):
         trial = cls(**kwargs)
         trial_from_db = cls.load(trial.id, interval=interval)
         if trial_from_db:
             return trial_from_db
 
         # This will raise DuplicateKeyError if there was any race condition
-        trial.save()
+        if not local:
+            trial.save()
 
         return trial
 
@@ -321,8 +322,9 @@ class Trial(object):
     __slots__ = ('_db', '_saved', '_status', '_refers',
                  '_tags', '_host', '_version', '_commandline', '_configuration',
                  '_stdout', '_stderr', '_interval', '_statistics', '_artifacts')
-    # _hashable = ('host', 'version', 'configuration')
-    _hashable = ('refers', 'host', 'version', 'commandline', 'configuration')
+    _hashable = ('refers', 'commandline', 'configuration')
+    # If defined, those in db should be identical.
+    _immutable = ('host', 'version')
     allowed_stati = ('new', 'reserved', 'running', 'failover', 'switchover', 'suspended',
                      'completed', 'interrupted', 'broken')
     reservable_stati = ('new', 'suspended', 'interrupted', 'failover', 'switchover')
@@ -407,6 +409,9 @@ class Trial(object):
 
     def complete(self):
         self._set_status('completed', ['running'])
+
+    def branch(self):
+        self._set_status('branched', ['new'])
 
     def broken(self):
         self._set_status('broken', ['running'])
@@ -652,7 +657,7 @@ class Trial(object):
     def status(self):
         """For meaning of property type, see `Trial.status`."""
         if not self._status.history:
-            self.status = 'new'
+            self._status.set('new')
 
         return self._status.get()
 

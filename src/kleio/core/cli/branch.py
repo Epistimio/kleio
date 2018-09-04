@@ -63,17 +63,17 @@ def main(args):
     config.pop('debug', None)
     config.pop('id', None)
 
-    trial = TrialNode.branch(args['id'], **config)
+    try:
+        trial = TrialNode.branch(args['id'], **config)
+    except RuntimeError as e:
+        if "Branch already exist with id" in str(e):
+            raise
+
+        raise SystemExit(DUPLICATE_ERROR_MESSAGE.format(trial=trial))
 
     for tag in tags.split(";"):
         if tag not in trial._tags.get():
             trial._tags.append(tag)
-
-    try:
-        trial.save()
-    except DuplicateKeyError:
-        print(DUPLICATE_ERROR_MESSAGE.format(trial=trial))
-        sys.exit(-1)
 
     print("Note that branched trials may only be resumed using their id")
 
