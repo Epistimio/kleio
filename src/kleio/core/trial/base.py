@@ -678,8 +678,13 @@ class Trial(object):
         return self.__hash__()
 
     @property
+    def short_id(self):
+        """Return first 7 characters of hash_name which is also the database key `_id`."""
+        return self.id[:7]
+
+    @property
     def hash_name(self):
-        """Generate a unique name with an md5sum hash for this `Trial`.
+        """Generate a unique name with an sha512 checksum hash for this `Trial`.
 
         .. note::
 
@@ -690,7 +695,7 @@ class Trial(object):
             If a trial is a branch, his hash_name is computed based on the composed configuration.
         """
         hash_string = "".join(str(getattr(self, name)) for name in self._hashable).encode('utf-8')
-        return hashlib.md5(hash_string).hexdigest()
+        return hashlib.sha512(hash_string).hexdigest()
 
     def __hash__(self):
         """Return the hashname for this trial"""
@@ -754,9 +759,9 @@ class TrialView(object):
     #                   Attributes
     valid_attributes = ([] +
                         # Properties
-                        ["id", "tags", "status", "refers", "host", "version", "commandline",
-                         "configuration", "stdout", "stderr", "interval", "hash_name",
-                         "start_time", "end_time", "statistics", "get_artifacts"] +
+                        ["id", "short_id", "tags", "status", "refers", "host", "version",
+                         "commandline", "configuration", "stdout", "stderr", "interval",
+                         "hash_name", "start_time", "end_time", "statistics", "get_artifacts"] +
                         # Methods
                         ["update"])
 
