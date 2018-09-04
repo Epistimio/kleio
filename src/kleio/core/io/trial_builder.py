@@ -196,7 +196,7 @@ class TrialBuilder(object):
     # kleio.client.wrap_argparser
 
     def fetch_full_config(self, cmdargs, use_db=True):
-        """Get dictionary of the full configuration of the experiment.
+        """Get dictionary of the full configuration of the trial.
 
         .. seealso::
 
@@ -259,6 +259,8 @@ class TrialBuilder(object):
             if Database().__class__.__name__.lower() != dbtype.lower():
                 raise
 
+            database = Database()
+
         return database
 
     def build_view_from(self, cmdargs):
@@ -275,7 +277,14 @@ class TrialBuilder(object):
         local_config = self.fetch_full_config(cmdargs)
         self.build_database(cmdargs)
 
-        trial = TrialNode.build(**local_config)
+        # Pop out configuration concerning databases and resources
+        local_config.pop('database', None)
+        local_config.pop('resources', None)
+        local_config.pop('debug', None)
+
+        local_config.setdefault('refers', None)
+
+        trial = TrialNode.build(local=True, **local_config)
         return TrialNode.view(trial.id)
 
     def build_from(self, cmdargs):
