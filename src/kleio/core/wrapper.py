@@ -25,6 +25,39 @@ from kleio.core.trial.base import Trial
 log = logging.getLogger(__name__)
 
 
+
+BROKEN = """
+You can check log with the following command:
+$ kleio cat --stderr {trial.short_id}
+
+To continue execution you can mark the trial as executable with:
+$ kleio switchover {trial.short_id}
+
+Or force execution with --switchover option:
+$ kleio exec --switchover {trial.short_id}
+"""
+
+
+RESERVE_BROKEN = """
+
+You can mark a broken trial as executable with the following command:
+$ kleio switchover {trial.short_id}
+
+You can also use the option --switch-over to force execution.
+"""
+
+
+INTERRUPT = """
+***
+Execution of '{trial.short_id}' interrupted by user
+
+Execution can be resumed using the same command
+$ kleio {trial.commandline}
+
+$ kleio exec {trial.id}
+"""
+
+
 class Consumer(object):
     """Consume a trial by using it to initialize a black-box box to evaluate it.
 
@@ -57,24 +90,22 @@ class Consumer(object):
         """
         try:
             trial.reserve()
+            trial.save()  # update the report
         except RuntimeError as e:
-            print("Failed to reserve '{}'".format(trial.id))
-            print(str(e))
+            logging.error("Failed to reserve '{}'".format(trial.short_id))
+            logging.error(str(e))
 
             if trial.status == 'broken':
-                print()
-                print("You can mark a broken trial as executable with the following command:")
-                print("$ kleio switchover '{}'".format(trial.id))
-                print()
-                print("You can also use the option --switch-over to force execution.")
+                # TODO: Move to CLI
+                print(RESERVE_BROKEN.format(trial=trial))
 
             sys.exit(0)
 
-        print("Trial reserved with id: {}".format(trial.id))
+        logging.info("Trial reserved with id: {}".format(trial.short_id))
 
         # Get path to user's script and infer trial configuration directory
 
-        working_dir = os.path.join(self.root_working_dir, trial.id)
+        working_dir = os.path.join(self.root_working_dir, trial.short_id)
         if not os.path.isdir(working_dir):
             log.debug("### Create new directory at '%s':", working_dir)
             os.makedirs(working_dir)
@@ -83,33 +114,24 @@ class Consumer(object):
         completed_trial = self._consume(trial, working_dir)
 
         if completed_trial is not None:
-            print("Trial successfully executed")
+            logging.info("Trial successfully executed")
             completed_trial.complete()
             completed_trial.save()
         else:
-            print("Trial crashed. Save as broken.")
+            logging.error("Trial crashed. Save as broken.")
+            # TODO: Move to CLI module
+            print(BROKEN.format(trial=trial))
             trial.broken()
             trial.save()
 
     def _consume(self, trial, working_dir):
-        print("Executing command:\n{}".format(trial.commandline))
+        logging.info("Executing command:\n{}".format(trial.commandline))
         trial.running()
         returncode = self.launch_process(trial, working_dir)
 
         if returncode != 0:
             log.error("Something went wrong. Process "
                       "returned with code %d !", returncode)
-            print()
-            print("You can check log with the following command:")
-            print("$ kleio cat --stderr {}".format(trial.id))
-            print()
-            print("To continue execution you can mark the trial as executable with:")
-            print("$ kleio switchover {}".format(trial.id))
-            print()
-            print("Or force execution with --switchover option:")
-            print("$ kleio exec --switchover {}".format(trial.id))
-            if returncode == 2:
-                sys.exit(2)
             return None
 
         return trial
@@ -132,20 +154,21 @@ class Consumer(object):
         log.debug("Executing with env:\n{}".format(pprint.pformat(env)))
 
         # Create the subprocess, redirect the standard output into a pipe
-        loop = asyncio.get_event_loop()
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
         try:
             task = execute(trial, capture=self.capture, cwd=working_dir, env=env)
             returncode = loop.run_until_complete(task)
         except KeyboardInterrupt as e:
-            print("\n***\nExecution of '{}' interrupted by user".format(trial.id))
-            print()
-            print("Execution can be resumed using the same command")
-            print("$ kleio {}".format(trial.commandline))
-            print("or ")
-            print("$ kleio exec {}".format(trial.id))
+            # TODO: Move to CLI
+            print(INTERRUPT.format(trial=trial))
             trial.suspend()
-            import sys
-            sys.exit(0)
+            trial.save()
+            raise e
+        except BaseException as e:
+            trial.broken()
+            trial.save()
+            raise e
         finally:
             loop.close()
 
