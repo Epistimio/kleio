@@ -22,6 +22,10 @@ def add_subparser(parser):
     """Return the parser that needs to be used for this command"""
     save_parser = parser.add_parser('save', help='save help')
 
+    save_parser.add_argument(
+        '--tags', default="",
+        help=('Tag for the trial, separated with `;`'))
+
     cli.get_basic_args_group(save_parser)
 
     # evc_cli.get_branching_args_group(save_parser)
@@ -36,4 +40,21 @@ def add_subparser(parser):
 def main(args):
     """Build and initialize experiment"""
     # By building the trial, we create a new trial document in database
-    TrialBuilder().build_from(args)
+    tags = [tag for tag in args.pop('tags', "").split(";") if tag]
+
+    if not args['commandline']:
+        raise SystemExit("Cannot save an empty execution")
+
+    trial = TrialBuilder().build_view_from(args)
+
+    if trial is not None:
+        raise SystemExit("ERROR: Trial already registered with id: {}".format(trial.short_id))
+
+    trial = TrialBuilder().build_from(args)
+
+    for tag in tags:
+        if tag not in trial._tags.get():
+            trial._tags.append(tag)
+
+    trial.save()
+    print("Trial successfully registered with id: {}".format(trial.short_id))
