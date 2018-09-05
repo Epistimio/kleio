@@ -101,7 +101,7 @@ class Consumer(object):
 
             sys.exit(0)
 
-        logging.info("Trial reserved with id: {}".format(trial.short_id))
+        print("Trial reserved with id: {}".format(trial.short_id))
 
         # Get path to user's script and infer trial configuration directory
 
@@ -125,7 +125,7 @@ class Consumer(object):
             trial.save()
 
     def _consume(self, trial, working_dir):
-        logging.info("Executing command:\n{}".format(trial.commandline))
+        print("Executing command:\n{}".format(trial.commandline))
         trial.running()
         returncode = self.launch_process(trial, working_dir)
 
