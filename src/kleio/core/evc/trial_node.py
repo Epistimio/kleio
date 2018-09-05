@@ -1,6 +1,7 @@
 from kleio.core.evc.tree import TreeNode
+from kleio.core.io import resolve_config
 from kleio.core.io.cmdline_parser import CmdlineParser
-from kleio.core.io.database import Database
+from kleio.core.io.database import Database, DuplicateKeyError
 from kleio.core.trial.attribute import (
     event_based_property, event_based_diff, EventBasedItemAttribute)
 from kleio.core.trial.base import Trial
@@ -48,26 +49,35 @@ class TrialNode(TreeNode):
             'parent_id': trial_id,
             'timestamp': timestamp
         }
-        cmdline_parser = CmdlineParser()
-        cmdline_parser.parse(parent_node.commandline.split(" "))
-        configuration = parent_node.configuration
-        configuration.update(kwargs['configuration'])
-        commandline = cmdline_parser.format(configuration)
-        branch_configuration = cmdline_parser.parse(kwargs['commandline'])
-        configuration.update(branch_configuration)
-        commandline = cmdline_parser.format(configuration)
-        kwargs['commandline'] = commandline.split(" ")
-        branch = Trial(**kwargs)
 
-        # Will fail if already branched
-        if parent_node.host is None or parent_node.version is None:
-            parent_node.branch()
+        print(parent_node.commandline, " ".join(kwargs['commandline']))
+        if parent_node.commandline.split(" ") != kwargs['commandline']:
+            cmdline_parser = CmdlineParser()
+            cmdline_parser.parse(parent_node.commandline.split(" "))
+            configuration = parent_node.configuration
+            configuration.update(kwargs['configuration'])
+            commandline = cmdline_parser.format(configuration)
+            branch_configuration = cmdline_parser.parse(kwargs['commandline'])
+            configuration.update(branch_configuration)
+            commandline = cmdline_parser.format(configuration)
+            kwargs['commandline'] = commandline.split(" ")
+
+        # Because version cannot be infered when branching without passing user script
+        # Then the user script need to be inferred from parent trial, and the version will be
+        # infered based on this script and current system. Even though the script path is the same,
+        # the version may have changed between parent node executiong and branching.
+        if 'version' not in kwargs:
+            user_script = resolve_config.fetch_user_script(
+                {'commandline': parent_node.commandline.split(" ")})
+            kwargs['version'] = resolve_config.infer_versioning_metadata(user_script)
+
+        branch = Trial(**kwargs)
 
         try:
             branch.save()
         except DuplicateKeyError as e:
-            parent_node.broken()
-            raise RuntimeError("Branch already exist with id '{trial.id}'".format(branch)) from e
+            raise RuntimeError(
+                "Branch already exist with id '{trial.id}'".format(trial=branch)) from e
 
         return TrialNode(branch.id, branch, parent=parent_node)
 
@@ -197,7 +207,7 @@ class TrialNode(TreeNode):
         configuration = flatten(self._get_event_based_diff_configuration())
         for key, value in list(configuration.items()):
             if isinstance(value, EventBasedItemAttribute):
-                configuration[key] = [(event['timestamp'], event['item']) for event in value]
+                configuration[key] = [(event['runtime_timestamp'], event['item']) for event in value]
 
         return unflatten(configuration)
 

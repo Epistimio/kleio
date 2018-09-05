@@ -38,6 +38,9 @@ def event_based_diff(old_start_time, new_start_time, old_config, new_config):
             old_config[key] = EventBasedItemAttribute()
 
         prior_item = old_config[key]
+        if prior_item == new_item:
+            continue
+
         # Turn attribute into event based and add prior and new items
         if not isinstance(prior_item, EventBasedItemAttribute):
             attr = EventBasedItemAttribute()

@@ -1,0 +1,7 @@
+one: value
+another: 1.0
+plus:
+    some:
+        hierarchical:
+            values
+    done: 2
