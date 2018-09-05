@@ -32,7 +32,9 @@ precedence is respected when building the settings dictionary:
 
 """
 import bson
+import errno
 import getpass
+import hashlib
 import logging
 import os
 import platform
@@ -40,6 +42,7 @@ import socket
 import subprocess
 import xml.etree.ElementTree
 
+import git
 from numpy import inf as infinity
 import yaml
 
@@ -163,12 +166,34 @@ def fetch_metadata(cmdargs):
     # metadata['user'] = getpass.getuser()
 
     metadata['host'] = fetch_host_info(cmdargs)
-    metadata['version'] = infer_versioning_metadata(cmdargs)
+    user_script = fetch_user_script(cmdargs)
+    if user_script:
+        metadata['version'] = infer_versioning_metadata(user_script)
 
     return metadata
 
 
+def fetch_user_script(cmdargs):
+    if 'commandline' not in cmdargs:
+        return None
+
+    user_script = cmdargs['commandline'][0]
+
+    if user_script == "python":
+        user_script = [arg for arg in cmdargs['commandline'][1:] if not arg.startswith("-")][0]
+
+    if user_script and not os.path.exists(user_script):
+        return None
+        # raise OSError(errno.ENOENT, "The path specified for the script does not exist", user_script)
+
+    return user_script
+
+
 def fetch_cmdline(cmdargs):
+    user_script = fetch_user_script(cmdargs)
+    # Why return None if no user script?
+    # if user_script is None:
+    #     return None
     if 'commandline' not in cmdargs:
         return None
 
@@ -231,12 +256,44 @@ def merge_configs(*configs):
     return merged_config
 
 
-def infer_versioning_metadata(existing_metadata):
-    """Infer information about user's script versioning if available."""
-    # VCS system
-    # User repo's version
-    # User repo's HEAD commit hash
-    return {}
+def fetch_user_repo(user_script):
+    """Fetch the GIT repo and its root path given user's script."""
+    dir_path = os.path.dirname(os.path.abspath(user_script))
+    try:
+        git_repo = git.Repo(dir_path, search_parent_directories=True)
+    except git.exc.InvalidGitRepositoryError as e:
+        git_repo = None
+        raise RuntimeError('Script {} should be in a git repository.'.format(
+            os.path.abspath(user_script))) from e
+    return git_repo
+
+
+def infer_versioning_metadata(user_script):
+    """
+    Infer information about user's script versioning if available.
+    Fills the following information in VCS:
+     `is_dirty` shows whether the git repo is at a clean state.
+    `HEAD_sha` gives the hash of head of the repo.
+    `active_branch` shows the active branch of the repo.
+    `diff_sha` shows the hash of the diff in the repo.
+     :returns: the `VCS` but filled with above info.
+     """
+    git_repo = fetch_user_repo(user_script)
+    if not git_repo:
+        return {}
+    vcs = {}
+    vcs['type'] = 'git'
+    vcs['is_dirty'] = git_repo.is_dirty()
+    vcs['HEAD_sha'] = git_repo.head.object.hexsha
+    if git_repo.head.is_detached:
+        vcs['active_branch'] = None
+    else:
+        vcs['active_branch'] = git_repo.active_branch.name
+    # The 'diff' of the current version from the latest commit
+    diff = git_repo.git.diff(git_repo.head.commit.tree).encode('utf-8')
+    diff_sha = hashlib.sha256(diff).hexdigest()
+    vcs['diff_sha'] = diff_sha
+    return vcs
 
 
 def fetch_host_info(config):

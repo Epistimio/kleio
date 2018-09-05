@@ -41,9 +41,9 @@ def add_default_subparser(parser, name):
 
 
 def sequential_worker(consumer, args):
-    allow_any_change = args.pop('allow_any_change')
-    allow_host_change = args.pop('allow_host_change', False) or allow_any_change
-    allow_version_change = args.pop('allow_version_change', False) or allow_any_change
+    # allow_any_change = args.pop('allow_any_change')
+    # allow_host_change = args.pop('allow_host_change', False) or allow_any_change
+    # allow_version_change = args.pop('allow_version_change', False) or allow_any_change
 
     config = TrialBuilder().fetch_full_config(args)
     TrialBuilder().build_database(dict(database=config['database']))
@@ -122,6 +122,10 @@ def execute_trial(consumer, trial, host, version, allow_host_change, allow_versi
             print("Branching {} because of different host".format(trial.short_id))
 
         try:
+            parent_node = TrialNode.load(trial.id)
+            # Force set parent node's status to branched to avoid reselecting it in the future with 
+            # empty run command (sequential worker)
+            parent_node.branch()
             trial = TrialNode.branch(trial.id, **config)
         except DuplicateKeyError:
             print("Skipping {}; branch already exist".format(trial.short_id))
@@ -142,12 +146,19 @@ def execute_trial(consumer, trial, host, version, allow_host_change, allow_versi
 def unique_worker(consumer, args):
     tags = [tag for tag in args.pop('tags', "").split(";") if tag]
     switchover = args.pop('switch_over', False)
-    allow_any_change = args.pop('allow_any_change')
-    allow_code_change = args.pop('allow_code_change', False) or allow_any_change
-    allow_host_change = args.pop('allow_host_change', False) or allow_any_change
-    allow_version_change = args.pop('allow_version_change', False) or allow_any_change
+    # allow_any_change = args.pop('allow_any_change')
+    # allow_code_change = args.pop('allow_code_change', False) or allow_any_change
+    # allow_host_change = args.pop('allow_host_change', False) or allow_any_change
+    # allow_version_change = args.pop('allow_version_change', False) or allow_any_change
 
-    trial = TrialBuilder().build_from(args)
+    try:
+        trial = TrialBuilder().build_from(args)
+    except RuntimeError as e:
+        if "should be in a git repository":
+            raise SystemExit("ERROR: {}".format(e))
+
+        raise e
+
     if trial.status == 'broken' and switchover:
         trial.switchover()
 
