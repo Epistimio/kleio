@@ -2,8 +2,7 @@ import argparse
 import sys
 from pprint import pprint
 
-from kleio.core.io.trial_builder import TrialBuilder
-from kleio.core.trial.base import Trial
+from kleio.core.cli.base import get_trial_from_short_id
 from kleio.core.evc.trial_node import TrialNode
 from kleio.core.wrapper import Consumer
 
@@ -21,20 +20,6 @@ def add_subparser(parser):
 
 
 def main(args):
-    database = TrialBuilder().build_database(args)
-    trials = database.read(Trial.trial_immutable_collection, { '_id':  {'$regex' : '^{}'.format(args['id']) }})
-    if len(trials) > 1:
-        print("Select one of these ids")
-        for trial in trials:
-            print(trial['_id'])
-        sys.exit(0)
-    elif len(trials) == 0:
-        print("Trial {} not found in db".format(args['id']))
-        trials = database.read(Trial.trial_immutable_collection, {}, {'_id': 1})
-        print([trial['_id'] for trial in trials])
-        import sys
-        sys.exit(0)
-
-    trial = TrialNode.view(trials[0]['_id'])
+    trial = TrialNode.view(get_trial_from_short_id(args, args.pop('id'))['_id'])
     import pdb
     pdb.set_trace()

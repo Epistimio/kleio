@@ -1,6 +1,7 @@
 import argparse
 import sys
 
+from kleio.core.cli.base import get_trial_from_short_id
 from kleio.core.io.database import DuplicateKeyError
 from kleio.core.io.trial_builder import TrialBuilder
 from kleio.core.evc.trial_node import TrialNode
@@ -63,8 +64,10 @@ def main(args):
     config.pop('debug', None)
     config.pop('id', None)
 
+    parent_id = get_trial_from_short_id(args, args.pop('id'))['_id']
+
     try:
-        trial = TrialNode.branch(args['id'], **config)
+        trial = TrialNode.branch(parent_id, **config)
     except RuntimeError as e:
         if "Branch already exist with id" in str(e):
             raise

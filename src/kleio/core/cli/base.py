@@ -15,7 +15,8 @@ import sys
 
 import kleio
 from kleio.core.cli.default import add_default_subparser
-
+from kleio.core.io.trial_builder import TrialBuilder
+from kleio.core.trial.base import Trial
 
 CLI_DOC_HEADER = """
 kleio:
@@ -122,6 +123,10 @@ class KleioArgsParser:
                   2: logging.DEBUG}
         logging.basicConfig(level=levels.get(verbose, logging.DEBUG))
 
+        if args.pop('allow_any_change', False):
+            args['allow_version_change'] = True
+            args['allow_host_change'] = True
+
         function = args.pop('func')
         return args, function
 
@@ -149,10 +154,6 @@ def get_version_args_group(parser):
     version_group = parser.add_argument_group(
         "Execution version related arguments",
         description="These argument determine automated branching or version conflicts.")
-
-    version_group.add_argument(
-        '--allow-code-change', action='store_true',
-        help="")
 
     version_group.add_argument(
         '--allow-version-change', action='store_true',
@@ -187,3 +188,22 @@ def get_user_args_group(parser):
              "keyword argument.")
 
     return usergroup
+
+
+def get_trial_from_short_id(args, trial_id):
+    database = TrialBuilder().build_database(args)
+    trials = database.read(Trial.trial_immutable_collection,
+                           { '_id':  {'$regex' : '^{}'.format(trial_id) }})
+    if len(trials) > 1:
+        print("Select one of these ids:")
+        for trial in trials:
+            print(trial['_id'])
+        raise SystemExit()
+
+    elif len(trials) == 0:
+        print("Trial {} not found in db".format(args['id']))
+        trials = database.read(Trial.trial_immutable_collection, {}, {'_id': 1})
+        print([trial['_id'] for trial in trials])
+        raise SystemExit()
+
+    return trials[0]
