@@ -275,16 +275,23 @@ class TrialBuilder(object):
             experiment view object.
         """
         local_config = self.fetch_full_config(cmdargs)
-        self.build_database(cmdargs)
 
+        return self.build_view_from_config(local_config)
+
+    def _clean_config(self, config):
         # Pop out configuration concerning databases and resources
-        local_config.pop('database', None)
-        local_config.pop('resources', None)
-        local_config.pop('debug', None)
+        config.pop('database', None)
+        config.pop('resources', None)
+        config.pop('debug', None)
+        config.pop('allow_version_change', None)
+        config.pop('allow_host_change', None)
+        config.setdefault('refers', None)
 
-        local_config.setdefault('refers', None)
-
-        trial = TrialNode.build(local=True, **local_config)
+    def build_view_from_config(self, config):
+        config = copy.deepcopy(config)
+        self.build_database(config)
+        self._clean_config(config)
+        trial = TrialNode.build(local=True, **config)
         return TrialNode.view(trial.id)
 
     def build_from(self, cmdargs):
@@ -317,17 +324,37 @@ class TrialBuilder(object):
             :class:`kleio.core.worker.experiment.Experiment` for more information on the experiment
             object.
         """
-        self.build_database(config)
-
-        log.info(config)
-
-        # Pop out configuration concerning databases and resources
-        config.pop('database', None)
-        config.pop('resources', None)
-        config.pop('debug', None)
-
-        config.setdefault('refers', None)
-
         # Raise DuplicateKeyError if concurrent trial with identical id
         # is written first in the database.
+        trial = self.build_view_from_config(config)
+
+        # Starting from scratch
+        if trial is None:
+            self._clean_config(config)
+            return TrialNode.build(**config)
+
+        # Branching trial
+        if trial.host != config['host'] or trial.version != config['version']:
+            return self.branch_from_config(config, trial=trial)
+
+        # Resume trial
+        self._clean_config(config)
         return TrialNode.build(**config)
+
+    def branch_from_config(self, config, trial=None):
+        if trial is None:
+            trial = self.build_view_from_config(config)
+            if trial is None:
+                raise RuntimeError("Cannot find trial {trial.short_id}".format(trial=trial))
+        import pprint
+        pprint.pprint(config)
+        if trial.host != config['host'] and not config['allow_host_change']:
+            raise RuntimeError("Current host differs from trial "
+                               "{trial.short_id}".format(trial=trial))
+
+        if trial.version != config['version'] and not config['allow_version_change']:
+            raise RuntimeError("Current code version differs from trial "
+                               "{trial.short_id}".format(trial=trial))
+
+        self._clean_config(config)
+        return TrialNode.branch(trial.id, **config)
