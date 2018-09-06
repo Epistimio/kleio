@@ -1,15 +1,20 @@
 import argparse
+import logging
 import pprint
 import traceback
 
 from kleio.core.cli import base as cli
-from kleio.core.io.database import Database
+from kleio.core.io import resolve_config
+from kleio.core.io.database import Database, DuplicateKeyError
 from kleio.core.io.trial_builder import TrialBuilder
 from kleio.core.wrapper import Consumer
 from kleio.core.trial import status
 from kleio.core.trial.base import Trial
 from kleio.core.evc.trial_node import TrialNode
 from kleio.core.utils.diff import colored_diff
+
+
+log = logging.getLogger(__file__)
 
 
 def add_default_subparser(parser, name):
@@ -41,15 +46,18 @@ def add_default_subparser(parser, name):
 
 
 def sequential_worker(consumer, args):
-    # allow_any_change = args.pop('allow_any_change')
-    # allow_host_change = args.pop('allow_host_change', False) or allow_any_change
-    # allow_version_change = args.pop('allow_version_change', False) or allow_any_change
+    allow_any_change = args.pop('allow_any_change', False)
+    allow_host_change = args.pop('allow_host_change', False) or allow_any_change
+    allow_version_change = args.pop('allow_version_change', False) or allow_any_change
+    switchover = args.pop('switch_over', False)
+    if switchover:
+        log.warning(
+            "--switch-over not supported for automated pool execution. It will be ignored.")
 
     config = TrialBuilder().fetch_full_config(args)
     TrialBuilder().build_database(dict(database=config['database']))
 
     host = config['host']
-    version = config['version']
 
     config.pop('database', None)
     config.pop('resources', None)
@@ -73,7 +81,7 @@ def sequential_worker(consumer, args):
 
         for trial in fetch_new_trials(query, trials_seen):
             new_trials = True
-            execute_trial(consumer, trial, host, version, allow_host_change, allow_version_change)
+            execute_trial(consumer, trial, host, allow_host_change, allow_version_change, config)
 
 
 def fetch_new_trials(query, trials_seen):
@@ -87,7 +95,7 @@ def fetch_new_trials(query, trials_seen):
             yield trial
 
 
-def execute_trial(consumer, trial, host, version, allow_host_change, allow_version_change):
+def execute_trial(consumer, trial, host, allow_host_change, allow_version_change, config):
     trial.update()
     try:
         trial.status
@@ -100,6 +108,7 @@ def execute_trial(consumer, trial, host, version, allow_host_change, allow_versi
         trial.save()
         return
 
+
     if trial.status not in status.RESERVABLE:
         print("Skipping {}; status changed to {} in a concurrent "
               "process".format(trial.short_id, trial.status))
@@ -108,6 +117,14 @@ def execute_trial(consumer, trial, host, version, allow_host_change, allow_versi
     if trial.host and trial.host != host and not allow_host_change:
         print("Skipping {}; different host".format(trial.short_id))
         return
+
+    # Because version cannot be infered when branching without passing user script
+    # Then the user script need to be inferred from parent trial, and the version will be
+    # infered based on this script and current system. Even though the script path is the same,
+    # the version may have changed between parent node executiong and branching.
+    user_script = resolve_config.fetch_user_script(
+        {'commandline': trial.commandline.split(" ")})
+    version = resolve_config.infer_versioning_metadata(user_script)
 
     if trial.version and trial.version != version and not allow_version_change:
         print("Skipping {}; different code version".format(trial.short_id))
@@ -125,7 +142,9 @@ def execute_trial(consumer, trial, host, version, allow_host_change, allow_versi
             parent_node = TrialNode.load(trial.id)
             # Force set parent node's status to branched to avoid reselecting it in the future with 
             # empty run command (sequential worker)
-            parent_node.branch()
+            parent_node.item.branch()
+            parent_node.save()
+            config['version'] = version
             trial = TrialNode.branch(trial.id, **config)
         except DuplicateKeyError:
             print("Skipping {}; branch already exist".format(trial.short_id))
@@ -135,7 +154,10 @@ def execute_trial(consumer, trial, host, version, allow_host_change, allow_versi
 
     try:
         consumer.consume(trial)
-    except BaseException as e:
+    except KeyboardInterrupt as e:
+        print("Interrupted")
+        raise SystemExit()
+    except Exception as e:
         print("Error: Trial {} is broken".format(trial.short_id))
         print()
         print("You can check log with the following command:")
@@ -166,7 +188,11 @@ def unique_worker(consumer, args):
         if tag not in trial._tags.get():
             trial._tags.append(tag)
         # trial.save()
-    consumer.consume(trial)
+
+    try:
+        consumer.consume(trial)
+    except KeyboardInterrupt as e:
+        raise SystemExit()
 
 
 # If selected trial has no host, --allow-change-host
