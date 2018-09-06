@@ -1,0 +1,2 @@
+class SignalInterrupt(KeyboardInterrupt):
+    pass

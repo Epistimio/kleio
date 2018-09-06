@@ -14,16 +14,28 @@ import logging
 import os
 import pprint
 import subprocess
-import sys
 import tempfile
+import signal
 import sys
 
+import kleio.core.utils.errors
 from kleio.core.io.database import Database
 from kleio.core.trial.base import Trial
 
 
 log = logging.getLogger(__name__)
 
+
+def sigterm_handler(signal, frame):
+    if sigterm_handler.triggered:
+        return
+    else:
+        sigterm_handler.triggered = True
+
+    raise kleio.core.utils.errors.SignalInterrupt("Experiment killed by the scheduler")
+
+
+sigterm_handler.triggered = False
 
 
 BROKEN = """
@@ -54,7 +66,21 @@ Execution of '{trial.short_id}' interrupted by user
 Execution can be resumed using the same command
 $ kleio {trial.commandline}
 
-$ kleio exec {trial.id}
+or by specifiying the short id to exec command
+
+$ kleio exec {trial.short_id}
+"""
+
+SIGNAL = """
+***
+Execution of '{trial.short_id}' interruped by signal
+
+Execution can be resumed using the same command
+$ kleio {trial.commandline}
+
+or by specifiying the short id to exec command
+
+$ kleio exec {trial.short_id}
 """
 
 
@@ -157,12 +183,19 @@ class Consumer(object):
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         try:
+            signal.signal(signal.SIGTERM, sigterm_handler)
             task = execute(trial, capture=self.capture, cwd=working_dir, env=env)
             returncode = loop.run_until_complete(task)
+        except kleio.core.utils.errors.SignalInterrupt as e:
+            print(SIGNAL.format(trial=trial))
+            trial.interrupt()
+            trial.save()
+            raise KeyboardInterrupt() from e
         except KeyboardInterrupt as e:
             # TODO: Move to CLI
             print(INTERRUPT.format(trial=trial))
-            trial.suspend()
+            if trial.status != "suspended":
+                trial.suspend()
             trial.save()
             raise e
         except BaseException as e:
@@ -181,10 +214,18 @@ def update(trial, sleep_time=10):
         try:
             yield from asyncio.sleep(sleep_time)
             trial.heartbeat()
-            trial.save()
-        except concurrent.futures.CancelledError:
-            trial.save()
+            # trial.save()
+        except RuntimeError as e:
+            if "Trial status changed meanwhile. Heartbeat failed." in str(e):
+                trial.update()
+                if trial.status == "suspended":
+                    raise KeyboardInterrupt(
+                        "Trial {trial.short_id} suspended remotely by user.".format(trial=trial))
             raise
+        except concurrent.futures.CancelledError:
+            raise
+        finally:
+            trial.save()
 
 
 @asyncio.coroutine
