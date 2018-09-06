@@ -204,7 +204,7 @@ def default(args):
     capture = args.pop('capture', False)
     debug = args.get('debug', False)
 
-    consumer = Consumer(root_working_dir, capture, debug)
+    consumer = Consumer(root_working_dir, capture)
 
     if not args['commandline']:
         sequential_worker(consumer, args)
