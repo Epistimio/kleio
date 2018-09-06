@@ -174,7 +174,7 @@ def fetch_metadata(cmdargs):
 
 
 def fetch_user_script(cmdargs):
-    if 'commandline' not in cmdargs:
+    if not "".join(cmdargs.get('commandline', [])).strip(" "):
         return None
 
     user_script = cmdargs['commandline'][0]
@@ -199,7 +199,11 @@ def fetch_cmdline(cmdargs):
 
     cmdline_parser = CmdlineParser()
     configuration = cmdline_parser.parse(cmdargs['commandline'])
-    return cmdline_parser.format(configuration).split(" ")
+    cmdline = cmdline_parser.format(configuration).split(" ")
+    if not configuration:
+        return None
+
+    return cmdline
 
 
 def merge_configs(*configs):
