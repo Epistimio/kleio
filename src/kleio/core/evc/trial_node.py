@@ -193,6 +193,16 @@ class TrialNode(TreeNode):
 
         return commandlines
 
+    def _get_event_based_diff(self, key):
+        item = getattr(self.item, key)
+        if self.parent:
+            parent_item = self.parent._get_event_based_diff(key)
+            return event_based_diff(
+                self.parent.end_time, self.item.start_time,
+                parent_item, item)
+
+        return item
+
     def _get_event_based_diff_configuration(self):
         if self.parent:
             parent_configuration = self.parent._get_event_based_diff_configuration()
@@ -201,6 +211,14 @@ class TrialNode(TreeNode):
                 parent_configuration, self.item.configuration)
 
         return self.item.configuration
+
+    def _trim_event_based_diff(self, diff):
+        diff = flatten(diff)
+        for key, value in list(diff.items()):
+            if isinstance(value, EventBasedItemAttribute):
+                diff[key] = [(event['runtime_timestamp'], event['item']) for event in value]
+
+        return unflatten(diff)
 
     @property
     def configuration(self):
@@ -213,21 +231,11 @@ class TrialNode(TreeNode):
 
     @property
     def hosts(self):
-        hosts = [(self.item.start_time, self.item.host)]
-
-        if self.parent:
-            hosts = self.parent.hosts + hosts
-
-        return hosts
+        return self._trim_event_based_diff(self._get_event_based_diff('host'))
 
     @property
     def versions(self):
-        versions = [(self.item.start_time, self.item.version)]
-
-        if self.parent:
-            versions = self.parent.versions + versions
-
-        return versions
+        return self._trim_event_based_diff(self._get_event_based_diff('version'))
 
     @property
     def statistics(self):
