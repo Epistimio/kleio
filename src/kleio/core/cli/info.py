@@ -1,8 +1,10 @@
 import argparse
 import pprint
 
+from kleio.core.cli.base import get_trial_from_short_id
 from kleio.core.io.trial_builder import TrialBuilder
 from kleio.core.evc.trial_node import TrialNode
+from kleio.core.trial.base import Trial
 from kleio.core.wrapper import Consumer
 
 
@@ -24,10 +26,11 @@ def add_subparser(parser):
 
 def main(args):
     TrialBuilder().build_database(args)
-    trial = TrialNode.load(args['id'])
+    trial = TrialNode.view(get_trial_from_short_id(args, args.pop('id'))['_id'])
     print('\n'.join("{}: {}".format(timestamp, cmdline) for timestamp, cmdline in trial.commandlines))
-    pprint.pprint(trial.host)
+    print(trial.id)
+    pprint.pprint(trial.hosts)
     pprint.pprint(trial.configuration)
     pprint.pprint(trial.status)
-    pprint.pprint(trial.version)
+    pprint.pprint(trial.versions)
     pprint.pprint(trial.refers)

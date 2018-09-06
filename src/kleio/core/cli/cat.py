@@ -1,5 +1,6 @@
 import argparse
 
+from kleio.core.cli.base import get_trial_from_short_id
 from kleio.core.io.trial_builder import TrialBuilder
 from kleio.core.evc.trial_node import TrialNode
 from kleio.core.wrapper import Consumer
@@ -22,7 +23,7 @@ def add_subparser(parser):
 
 def main(args):
     TrialBuilder().build_database(args)
-    trial = TrialNode.view(args['id'])
+    trial = TrialNode.view(get_trial_from_short_id(args, args.pop('id'))['_id'])
     print('\n'.join(trial.stdout))
 
     if args.get('stderr'):
