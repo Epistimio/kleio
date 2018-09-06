@@ -326,10 +326,10 @@ class Trial(object):
     # If defined, those in db should be identical.
     _immutable = ('host', 'version')
     allowed_stati = ('new', 'reserved', 'running', 'failover', 'switchover', 'suspended',
-                     'completed', 'interrupted', 'broken')
+                     'completed', 'interrupted', 'broken', 'branched')
     reservable_stati = ('new', 'suspended', 'interrupted', 'failover', 'switchover')
     interruptable_stati = ('running', )
-    switchover_stati = ('reserved', 'broken')
+    switchover_stati = ('reserved', 'broken', 'branched')
 
     trial_immutable_collection = 'trials.immutables'
     trial_report_collection = 'trials.reports'
@@ -401,7 +401,7 @@ class Trial(object):
             "Trial with status '{status}' cannot have a heartbeat.",
             "Trial status changed meanwhile. Heartbeat failed.")
 
-    def interupt(self):
+    def interrupt(self):
         self._set_status('interrupted', self.interruptable_stati)
 
     def suspend(self):
@@ -411,7 +411,7 @@ class Trial(object):
         self._set_status('completed', ['running'])
 
     def branch(self):
-        self._set_status('branched', ['new'])
+        self._set_status('branched', self.reservable_stati)
 
     def broken(self):
         self._set_status('broken', ['running'])
