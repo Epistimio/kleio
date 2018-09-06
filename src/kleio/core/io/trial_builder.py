@@ -285,6 +285,7 @@ class TrialBuilder(object):
         config.pop('debug', None)
         config.pop('allow_version_change', None)
         config.pop('allow_host_change', None)
+        config.pop('id', None)
         config.setdefault('refers', None)
 
     def build_view_from_config(self, config):
@@ -312,6 +313,26 @@ class TrialBuilder(object):
         # Raise DuplicateKeyError if concurrent trial with identical id
         # is written first in the database.
         return self.build_from_config(full_config)
+
+    def build_from_id(self, cmdargs):
+        config = self.fetch_full_config(cmdargs)
+        self.build_database(config)
+
+        trial = TrialNode.view(cmdargs['id'])
+
+        if 'version' not in config:
+            user_script = resolve_config.fetch_user_script(
+                {'commandline': trial.commandline.split(" ")})
+            config['version'] = resolve_config.infer_versioning_metadata(user_script)
+            config['commandline'] = trial.commandline.split(" ")
+            config['configuration'] = trial.configuration
+
+        # Branching trial
+        if trial.host != config['host'] or trial.version != config['version']:
+            return self.branch_from_config(config, trial=trial)
+
+        # Resume trial
+        return TrialNode.load(cmdargs['id'])
 
     def build_from_config(self, config):
         """Build a fully configured (and writable) experiment based on full configuration.
@@ -346,8 +367,7 @@ class TrialBuilder(object):
             trial = self.build_view_from_config(config)
             if trial is None:
                 raise RuntimeError("Cannot find trial {trial.short_id}".format(trial=trial))
-        import pprint
-        pprint.pprint(config)
+
         if trial.host != config['host'] and not config['allow_host_change']:
             raise RuntimeError("Current host differs from trial "
                                "{trial.short_id}".format(trial=trial))
