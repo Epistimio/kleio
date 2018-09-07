@@ -38,6 +38,7 @@ import hashlib
 import logging
 import os
 import platform
+import re
 import socket
 import subprocess
 import xml.etree.ElementTree
@@ -173,14 +174,18 @@ def fetch_metadata(cmdargs):
     return metadata
 
 
+PYTHON_RE = re.compile(r'\bpython(\d(.\d)?)? .*?\w+.py\b')
+
+
 def fetch_user_script(cmdargs):
     if not "".join(cmdargs.get('commandline', [])).strip(" "):
         return None
 
-    user_script = cmdargs['commandline'][0]
-
-    if user_script == "python":
-        user_script = [arg for arg in cmdargs['commandline'][1:] if not arg.startswith("-")][0]
+    result = PYTHON_RE.search(" ".join(cmdargs['commandline']))
+    if result:
+        user_script = result.group(0).split(" ")[-1]
+    else:
+        user_script = cmdargs['commandline'][0]
 
     if user_script and not os.path.exists(user_script):
         return None
