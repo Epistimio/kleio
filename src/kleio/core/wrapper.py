@@ -257,7 +257,7 @@ def execute(trial, cwd, env, capture=False, sleep_time=10):
              asyncio.async(log_stream(trial._stderr, proc.stderr, capture)),
              asyncio.async(proc.wait())]
 
-    update_task = asyncio.async(update(trial, sleep_time=sleep_time))
+    update_task = yield from update(trial, sleep_time=sleep_time)
 
     yield from asyncio.wait(tasks)
 
