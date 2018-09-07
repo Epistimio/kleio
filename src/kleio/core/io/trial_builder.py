@@ -323,6 +323,9 @@ class TrialBuilder(object):
         if 'version' not in config:
             user_script = resolve_config.fetch_user_script(
                 {'commandline': trial.commandline.split(" ")})
+            if not user_script:
+                raise RuntimeError("Cannot find user script from commandline:"
+                                   "\n{trial.commandline}".format(trial=trial))
             config['version'] = resolve_config.infer_versioning_metadata(user_script)
             config['commandline'] = trial.commandline.split(" ")
             config['configuration'] = trial.configuration

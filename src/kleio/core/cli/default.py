@@ -124,6 +124,11 @@ def execute_trial(consumer, trial, host, allow_host_change, allow_version_change
     # the version may have changed between parent node executiong and branching.
     user_script = resolve_config.fetch_user_script(
         {'commandline': trial.commandline.split(" ")})
+    if user_script is None:
+        print("Skipping {}; cannot find user script from "
+              "commandline:\n{}".format(trial.short_id, " ".join(trial.commandline.split(" "))))
+        return
+
     version = resolve_config.infer_versioning_metadata(user_script)
 
     if trial.version and trial.version != version and not allow_version_change:

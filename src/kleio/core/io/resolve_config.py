@@ -181,16 +181,22 @@ def fetch_user_script(cmdargs):
     if not "".join(cmdargs.get('commandline', [])).strip(" "):
         return None
 
+    log.debug("Analysing cmdline: {}".format(" ".join(cmdargs['commandline'])))
+
     result = PYTHON_RE.search(" ".join(cmdargs['commandline']))
     if result:
         user_script = result.group(0).split(" ")[-1]
     else:
         user_script = cmdargs['commandline'][0]
 
+    log.debug("Found user_script {}".format(user_script))
+
     if user_script and not os.path.exists(user_script):
+        log.debug("User script does not exist.")
         return None
         # raise OSError(errno.ENOENT, "The path specified for the script does not exist", user_script)
 
+    log.debug("User script does exist.")
     return user_script
 
 
