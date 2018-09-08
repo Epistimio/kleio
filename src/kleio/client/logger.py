@@ -45,11 +45,11 @@ class Logger(object):
         # would return training_loss, validation_loss, etc, all aggregated
         return unflatten(rvals)
 
-    def load_artifacts(self, filename, query, backup_path="."):
-        python_logger.warning(
-            "'{}' is being loaded from the database. It may take a while...".format(filename))
-        return [(RemoteFileWrapper(f), metadata)
-                for (f, metadata) in self.trial.get_artifacts(filename, query)]
+    def load_artifacts(self, filename, query):
+        for f, metadata in self.trial.get_artifacts(filename, query):
+            yield (RemoteFileWrapper(f), metadata)
+
+
 
 
 class AnalyzeLogger(Logger):
@@ -91,10 +91,8 @@ class AnalyzeLogger(Logger):
         return unflatten(rvals)
 
     def load_artifacts(self, filename, query, backup_path="."):
-        python_logger.warning(
-            "'{}' is being loaded from the database. It may take a while...".format(filename))
-        return [(RemoteFileWrapper(f), metadata)
-                for (f, metadata) in self.trial.get_artifacts(filename, query)]
+        for f, metadata in self.trial.get_artifacts(filename, query):
+            yield (RemoteFileWrapper(f), metadata)
 
 
 class BackupLogger(object):
@@ -138,16 +136,23 @@ class BackupLogger(object):
 
 
 class RemoteFileWrapper(object):
-    def __init__(self, remote_file):
-        self._remote_file = remote_file
+    def __init__(self, remote_file, chunk_size=255 * 1024):
+        self.remote_file = remote_file
+        self.chunk_size = chunk_size
+
+    def readchunk(self):
+        if self.remote_file.closed:
+            return None
+
+        return self.remote_file.read(self.chunk_size)
 
     def download(self):
         b = io.BytesIO()
-        chunk = self._remote_file.readchunk()
+        chunk = self.readchunk()
         while chunk:
             b.write(chunk)
-            chunk = self._remote_file.readchunk()
-        self._remote_file.seek(0)
+            chunk = self.readchunk()
+        self.remote_file.seek(0)
         b.seek(0)
 
         return b

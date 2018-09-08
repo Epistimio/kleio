@@ -366,7 +366,7 @@ def fetch_platform_info():
 
 def fetch_host_env_vars(config):
     host_env_vars = sorteddict()
-    for env_var in config.get('host_env_vars', ['CLUSTER']):
+    for env_var in set(config.get('host_env_vars', []) + ['CLUSTER', 'KLEIO_DATABASE_FILE_DIR']):
         host_env_vars[env_var] = os.environ.get(env_var, None)
 
     return host_env_vars

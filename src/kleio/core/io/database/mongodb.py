@@ -9,6 +9,7 @@
 
 """
 import functools
+import os
 
 import gridfs
 import pymongo
@@ -244,14 +245,30 @@ class MongoDB(AbstractDB):
         result = dbcollection.delete_many(filter=query)
         return result.acknowledged
 
-    def write_file(self, collection_name, data, **kwargs):
+    def write_file(self, collection_name, file_like_object, metadata):
         # kwargs.setdefault('chunk_size', 261120 * 2 * 2)
-        fs = gridfs.GridFS(self._db, collection=collection_name)
-        return fs.put(data, **kwargs)
+        # fs = gridfs.GridFS(self._db, collection=collection_name)
+        self.write(collection_name + ".metadata", metadata)
+        # TODO: Set inside of kleio.config
+        dir_path = os.environ['KLEIO_DATABASE_FILE_DIR']
+        with open(os.path.join(dir_path, metadata['_id']), 'wb') as f:
+            f.write(file_like_object.read())
 
-    def read_file(self, collection_name, query):
-        fs = gridfs.GridFS(self._db, collection=collection_name)
-        return [(f, f.metadata) for f in fs.find(query)]
+    def read_file(self, collection_name, query, raise_if_not_found=True):
+        # fs = gridfs.GridFS(self._db, collection=collection_name)
+        dir_path = os.environ['KLEIO_DATABASE_FILE_DIR']
+        for metadata in self.read(collection_name + ".metadata", query):
+            file_path = os.path.join(dir_path, metadata['_id'])
+
+            if not os.path.exists(file_path) and raise_if_not_found:
+                raise RuntimeError("File {} cannot be found".format(file_path))
+            elif not os.path.exists(file_path):
+                continue
+
+            # with open(file_path, 'rb') as f:
+            yield (open(file_path, 'rb'), metadata)
+
+        # return [(f, f.metadata) for f in fs.find(query)]
 
     def _sanitize_attrs(self):
         """Sanitize attributes using MongoDB's 'uri_parser' module."""

@@ -1,3 +1,5 @@
+from itertools import chain
+
 from kleio.core.evc.tree import TreeNode
 from kleio.core.io import resolve_config
 from kleio.core.io.cmdline_parser import CmdlineParser
@@ -177,12 +179,11 @@ class TrialNode(TreeNode):
         self.item.stderr += new_lines
 
     def get_artifacts(self, filename, query):
-        artifacts = self.item.get_artifacts(filename, query)
+        if not self.parent:
+            return self.item.get_artifacts(filename, query)
 
-        if self.parent:
-            artifacts = self.parent.get_artifacts(filename, query) + artifacts
-
-        return artifacts
+        return chain(self.parent.get_artifacts(filename, query),
+                     self.item.get_artifacts(filename, query))
 
     @property
     def commandlines(self):
