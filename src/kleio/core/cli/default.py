@@ -161,7 +161,8 @@ def execute_trial(consumer, trial, host, allow_host_change, allow_version_change
         consumer.consume(trial)
     except KeyboardInterrupt as e:
         print("Interrupted")
-        raise SystemExit()
+        if not "suspended remotely by user" in str(e):
+            raise SystemExit()
     except Exception as e:
         print("Error: Trial {} is broken".format(trial.short_id))
         print()
