@@ -98,7 +98,7 @@ class AnalyzeLogger(Logger):
 
 
 class BackupLogger(object):
-    def log_statistic(**statistics):
+    def log_statistic(self, **statistics):
         pprint.pprint(statistics)
 
     def log_artifact(self, filename, artifact, backup_path='.', **attributes):
