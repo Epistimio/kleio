@@ -132,9 +132,14 @@ class EventBasedAttributeWithDB(EventBasedAttribute):
 
     def _setup_db(self):
         if not EventBasedAttributeWithDB.db_is_setup:
-            self._db.ensure_index(self.collection_name, 'trial_id')
-            self._db.ensure_index(self.collection_name, 'runtime_timestamp')
-            self._db.ensure_index(self.collection_name, 'creation_timestamp')
+            try:
+                self._db.ensure_index(self.collection_name, 'trial_id')
+                self._db.ensure_index(self.collection_name, 'runtime_timestamp')
+                self._db.ensure_index(self.collection_name, 'creation_timestamp')
+            except BaseException as e:
+                if not "not authorized on" in str(e):
+                    raise
+
             EventBasedAttributeWithDB.db_is_setup = True
 
     @property
@@ -219,10 +224,15 @@ class EventBasedFileAttributeWithDB(EventBasedAttributeWithDB):
 
     def _setup_db(self):
         if not EventBasedFileAttributeWithDB.db_is_setup:
-            self._db.ensure_index(self.collection_name + ".metadata", 'trial_id')
-            self._db.ensure_index(self.collection_name + ".metadata", 'filename')
-            self._db.ensure_index(self.collection_name + ".metadata", 'runtime_timestamp')
-            self._db.ensure_index(self.collection_name + ".metadata", 'creation_timestamp')
+            try:
+                self._db.ensure_index(self.collection_name + ".metadata", 'trial_id')
+                self._db.ensure_index(self.collection_name + ".metadata", 'filename')
+                self._db.ensure_index(self.collection_name + ".metadata", 'runtime_timestamp')
+                self._db.ensure_index(self.collection_name + ".metadata", 'creation_timestamp')
+            except BaseException as e:
+                if not "not authorized on" in str(e):
+                    raise
+
             EventBasedFileAttributeWithDB.db_is_setup = True
 
     def replay(self):
