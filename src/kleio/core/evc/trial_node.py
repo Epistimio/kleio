@@ -52,7 +52,7 @@ class TrialNode(TreeNode):
             'timestamp': timestamp
         }
 
-        print(parent_node.commandline, " ".join(kwargs['commandline']))
+        # print(parent_node.commandline, " ".join(kwargs['commandline']))
         if parent_node.commandline.split(" ") != kwargs['commandline']:
             cmdline_parser = CmdlineParser()
             cmdline_parser.parse(parent_node.commandline.split(" "))
