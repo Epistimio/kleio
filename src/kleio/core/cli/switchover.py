@@ -12,7 +12,7 @@ def add_subparser(parser):
     switchover_parser = parser.add_parser('switchover', help='switchover help')
 
     switchover_parser.add_argument(
-        'id', help="id of the trial. Can be name or hash.")
+        'ids', nargs='+', help="id[s] of the trial.")
 
     switchover_parser.set_defaults(func=main)
 
@@ -21,7 +21,12 @@ def add_subparser(parser):
 
 def main(args):
     TrialBuilder().build_database(args)
-    trial = TrialNode.load(get_trial_from_short_id(args, args.pop('id'))['_id'])
-    trial.switchover()
-    trial.save()
-    print("Trial {trial.short_id} status turned to switchover".format(trial=trial))
+    for trial_id in args.pop('ids'):
+        trial = TrialNode.load(get_trial_from_short_id(args, trial_id)['_id'])
+        try:
+            trial.switchover()
+        except RuntimeError as e:
+            print("ERROR:{trial.short_id}: {err}".format(trial=trial, err=str(e)))
+            continue
+        trial.save()
+        print("Trial {trial.short_id} status turned to switchover".format(trial=trial))
