@@ -380,4 +380,15 @@ class TrialBuilder(object):
                                "{trial.short_id}".format(trial=trial))
 
         self._clean_config(config)
-        return TrialNode.branch(trial.id, **config)
+        return self.branch_leaf(trial.id, **config)
+
+    def branch_leaf(self, trial, **config):
+        try:
+            trial = TrialNode.branch(trial.id, timestamp=trial.start_time, **config)
+        except RuntimeError as e:
+            if not "Branch already exist with id" in str(e):
+                raise
+
+            trial = branch_leaf(TrialNode.load(str(e).split(" ")[-1].strip("'")), **config)
+
+        return trial

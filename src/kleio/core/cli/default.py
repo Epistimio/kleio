@@ -12,7 +12,7 @@ from kleio.core.trial import status
 from kleio.core.trial.base import Trial
 from kleio.core.evc.trial_node import TrialNode
 from kleio.core.utils.diff import colored_diff
-
+import kleio.core.utils.errors
 
 log = logging.getLogger(__file__)
 
@@ -81,7 +81,14 @@ def sequential_worker(consumer, args):
 
         for trial in fetch_new_trials(query, trials_seen):
             new_trials = True
-            execute_trial(consumer, trial, host, allow_host_change, allow_version_change, config)
+            try:
+                execute_trial(consumer, trial, host, allow_host_change, allow_version_change,
+                              config, tags)
+            except BaseException as e:
+                print("Skipping {trial.short_id} because of error:")
+                print(str(e))
+
+    print("No more trials executable. Leaving...")
 
 
 def fetch_new_trials(query, trials_seen):
@@ -95,7 +102,7 @@ def fetch_new_trials(query, trials_seen):
             yield trial
 
 
-def execute_trial(consumer, trial, host, allow_host_change, allow_version_change, config):
+def execute_trial(consumer, trial, host, allow_host_change, allow_version_change, config, tags):
     trial.update()
     try:
         trial.status
@@ -107,7 +114,6 @@ def execute_trial(consumer, trial, host, allow_host_change, allow_version_change
         trial.broken()
         trial.save()
         return
-
 
     if trial.status not in status.RESERVABLE:
         print("Skipping {}; status changed to {} in a concurrent "
@@ -145,13 +151,19 @@ def execute_trial(consumer, trial, host, allow_host_change, allow_version_change
 
         try:
             parent_node = TrialNode.load(trial.id)
-            # Force set parent node's status to branched to avoid reselecting it in the future with 
+            # Force set parent node's status to branched to avoid reselecting it in the future with
             # empty run command (sequential worker)
             parent_node.item.branch()
             parent_node.save()
             config['version'] = version
-            trial = TrialNode.branch(trial.id, **config)
-        except DuplicateKeyError:
+            # print(config['commandline'])
+            # trial = TrialNode.branch(trial.id, **config)
+            trial = TrialBuilder().branch_leaf(parent_node, **config)
+            for tag in tags:
+                if tag not in trial._tags.get():
+                    trial._tags.append(tag)
+            trial.save()
+        except kleio.core.utils.errors.RaceCondition as e:
             print("Skipping {}; branch already exist".format(trial.short_id))
             return
     else:

@@ -20,6 +20,7 @@ from .attribute import (
     event_based_property, EventBasedAttribute,
     EventBasedListAttributeWithDB, EventBasedItemAttributeWithDB, EventBasedFileAttributeWithDB)
 from .statistic import Statistics
+import kleio.core.utils.errors
 
 
 log = logging.getLogger(__name__)
@@ -378,11 +379,11 @@ class Trial(object):
             raise RuntimeError(invalid_status_message.format(status=status, new_status=new_status))
 
         try:
-            # If status changed from reserved meanwhile, than the id while could a duplicate key
-            # error, making this that this fails if the status changed meanwhile.
+            # If status changed from reserved meanwhile, than the id could be duplicate 
+            # and this would raise a duplicate key error
             self.status = new_status
         except DuplicateKeyError as e:
-            raise RuntimeError(
+            raise kleio.core.utils.errors.RaceCondition(
                 race_condition_message.format(new_status=new_status)) from e
 
     def running(self):

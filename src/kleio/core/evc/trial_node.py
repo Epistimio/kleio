@@ -8,6 +8,7 @@ from kleio.core.trial.attribute import (
     event_based_property, event_based_diff, EventBasedItemAttribute)
 from kleio.core.trial.base import Trial
 from kleio.core.utils import flatten, unflatten
+import kleio.core.utils.errors
 
 from kleio.core.trial.statistic import Statistics
 
@@ -78,7 +79,7 @@ class TrialNode(TreeNode):
         try:
             branch.save()
         except DuplicateKeyError as e:
-            raise RuntimeError(
+            raise kleio.core.utils.errors.RaceCondition(
                 "Branch already exist with id '{trial.id}'".format(trial=branch)) from e
 
         return TrialNode(branch.id, branch, parent=parent_node)
