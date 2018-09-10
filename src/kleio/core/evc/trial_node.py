@@ -48,6 +48,13 @@ class TrialNode(TreeNode):
         parent_node = cls.view(trial_id, interval=(None, timestamp))
         timestamp = timestamp if timestamp else parent_node.end_time
 
+        # WARNING: The timestamp may be rounded when saved in database. If passing the timestamp as
+        # generate at runtime, and not as loaded from parent status create_timestamps, then the
+        # children may have an id computed on a refers[timestamp] which could be different than the
+        # one saved in the db. This leads to a divergence of ids and degenerate database.
+        # Example: 
+        #   At runtime:  2018-09-10 23:37:02.277881
+        #   In database: 2018-09-10 23:37:02.277000
         kwargs['refers'] = {
             'parent_id': trial_id,
             'timestamp': timestamp
@@ -223,7 +230,7 @@ class TrialNode(TreeNode):
         return unflatten(diff)
 
     @property
-    def configuration(self):
+    def configurations(self):
         configuration = flatten(self._get_event_based_diff_configuration())
         for key, value in list(configuration.items()):
             if isinstance(value, EventBasedItemAttribute):

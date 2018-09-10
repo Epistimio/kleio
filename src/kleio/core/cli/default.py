@@ -82,8 +82,11 @@ def sequential_worker(consumer, args):
         for trial in fetch_new_trials(query, trials_seen):
             new_trials = True
             try:
-                execute_trial(consumer, trial, host, allow_host_change, allow_version_change,
-                              config, tags)
+                trial = process_trial(consumer, trial, host, allow_host_change, allow_version_change, config, tags)
+                # Make sure we do not fetch again branched trials
+                trials_seen.add(trial.id)
+
+                execute_trial(consumer, trial)
             except BaseException as e:
                 print("Skipping {trial.short_id} because of error:")
                 print(str(e))
@@ -102,7 +105,7 @@ def fetch_new_trials(query, trials_seen):
             yield trial
 
 
-def execute_trial(consumer, trial, host, allow_host_change, allow_version_change, config, tags):
+def process_trial(consumer, trial, host, allow_host_change, allow_version_change, config, tags):
     trial.update()
     try:
         trial.status
@@ -153,12 +156,15 @@ def execute_trial(consumer, trial, host, allow_host_change, allow_version_change
             parent_node = TrialNode.load(trial.id)
             # Force set parent node's status to branched to avoid reselecting it in the future with
             # empty run command (sequential worker)
+            # brand_new = parent_node.status == 'new'
             parent_node.item.branch()
             parent_node.save()
             config['version'] = version
-            # print(config['commandline'])
-            # trial = TrialNode.branch(trial.id, **config)
-            trial = TrialBuilder().branch_leaf(parent_node, **config)
+            # if branch_new:
+            #     timestamp=parent_node.start_time
+            # else:
+            #     timestamp=parent_node.end_time
+            trial = TrialBuilder().branch_leaf(parent_node, timestamp=None, **config)
             for tag in tags:
                 if tag not in trial._tags.get():
                     trial._tags.append(tag)
@@ -169,6 +175,10 @@ def execute_trial(consumer, trial, host, allow_host_change, allow_version_change
     else:
         trial = TrialNode.load(trial.id)
 
+    return trial
+
+
+def execute_trial(consumer, trial):
     try:
         consumer.consume(trial)
     except KeyboardInterrupt as e:
