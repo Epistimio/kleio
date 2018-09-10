@@ -345,7 +345,8 @@ class Trial(object):
         self._configuration = sorteddict(configuration)
         self._version = sorteddict(version)
         self._host = sorteddict(host)
-        self._tags = EventBasedListAttributeWithDB(self.id, 'tags', interval)
+        # Tags should be timeless
+        self._tags = EventBasedListAttributeWithDB(self.id, 'tags', (None, None))
         self._status = EventBasedItemAttributeWithDB(self.id, 'status', interval)
         self._stdout = EventBasedListAttributeWithDB(self.id, 'stdout', interval)
         self._stderr = EventBasedListAttributeWithDB(self.id, 'stderr', interval)
