@@ -1,6 +1,7 @@
 import argparse
 import time
 
+from kleio.core.cli.base import get_trial_from_short_id
 from kleio.core.io.trial_builder import TrialBuilder
 from kleio.core.evc.trial_node import TrialNode
 from kleio.core.wrapper import Consumer
@@ -24,12 +25,12 @@ def add_subparser(parser):
 
 def main(args):
     TrialBuilder().build_database(args)
-    trial = TrialNode.view(args['id'])
+    trial = TrialNode.view(get_trial_from_short_id(args, args.pop('id'))['_id'])
     idx = max(len(trial.stdout) - 5, 0)
     print("\n".join(trial.stdout[idx:]))
     while args['follow'] and trial.status == "running":
         time.sleep(5)
-        idx = len(trial.stdout)
+        idx = len(trial.stdout) + 1
         trial.update()
         new_lines = "\n".join(trial.stdout[idx:])
         if new_lines:
