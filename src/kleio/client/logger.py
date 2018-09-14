@@ -60,7 +60,7 @@ class AnalyzeLogger(Logger):
                 "Trial with id '{}' could not be found in database".format(trial_id))
 
     def insert_statistic(self, timestamp, **statistics):
-        statistics.setdefault('tags', list(set(self.trial.tags) | set(kleio_logger.trial.tags)))
+        statistics.setdefault('tags', ";".join(kleio_logger.trial.tags))
         from kleio.core.io.database import DuplicateKeyError
         try:
             self.trial.add_statistic(creator=KLEIO_TRIAL_ID, timestamp=timestamp, **statistics)
