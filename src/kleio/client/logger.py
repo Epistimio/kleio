@@ -96,11 +96,35 @@ class AnalyzeLogger(Logger):
 
 
 class BackupLogger(object):
+    def __init__(self, trial_id=None):
+        try:
+            from kleio.core.io.trial_builder import TrialBuilder
+            from kleio.core.evc.trial_node import TrialNode
+            TrialBuilder().build_database({})  # {'debug': KLEIO_DEBUG_MODE})
+            self.trial = TrialNode.load(trial_id)
+        except Exception as e:
+            print(str(e))
+            self.trial = None
+
     def log_statistic(self, **statistics):
         pprint.pprint(statistics)
 
+    def insert_statistic(self, **statistics):
+        pprint.pprint(statistics)
+
+    def insert_statistic(self, timestamp, **statistics):
+        statistics.setdefault('tags', self.trial.tags)
+        print("If using kleio, would insert at runtime_timestamp {}".format(timestamp))
+        pprint.pprint(statistics)
+
+    def load_config(self):
+        if self.trial is None:
+            return {}
+        return self.trial.configurations
+
     def log_artifact(self, filename, artifact, backup_path='.', **attributes):
         python_logger.warning("Cannot log artifact '{}' if `kleio` is not used".format(filename))
+        pprint.pprint(attributes)
 
         # with open(os.path.join(backup_path, filename), 'wb') as f:
         #     artifact.seek(0)
@@ -109,30 +133,17 @@ class BackupLogger(object):
         # with open(os.path.join(backup_path, filename + ".metadata"), 'wb') as f:
         #     pickle.dump(attributes, f)
 
-
     def load_statistic(self, query):
         python_logger.warning("Cannot load statistics if `kleio` is not used")
         return {}
 
-    def load_artifacts(self, filename, backup_path="."):
-        # if os.path.exists(os.path.join(backup_path, filename)):
-        #     file_path = os.path.join(backup_path, filename)
-        #     print("{} is being loaded from file system".format(file_path))
+    def load_artifacts(self, filename, query):
+        if self.trial is None:
+            python_logger.warning("Cannot load artifacts '{}' if `kleio` is not used".format(filename))
+            return []
 
-        #     file_like_object = io.BytesIO()
-        #     with open(file_path, 'rb') as f:
-        #         file_like_object.write(f.read())
-        #         file_like_object.seek(0)
-
-        #     with open(file_path + ".metadata", 'rb') as f:
-        #         metadata = pickle.load(f)
-
-        #     return [(file_like_object, metadata)]
-
-        # TODO: Use kleio if available to verify integrity of the file
-
-        python_logger.warning("Cannot load artifacts '{}' if `kleio` is not used".format(filename))
-        return []
+        for f, metadata in self.trial.get_artifacts(filename, query):
+            yield (RemoteFileWrapper(f), metadata)
 
 
 class RemoteFileWrapper(object):
