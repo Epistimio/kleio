@@ -197,13 +197,6 @@ class Trial(object):
 
     @classmethod
     def load(cls, trial_id, interval=(None, None)):
-        """Builder method for a list of trials.
-
-        :param trial_entries: List of trial representation in dictionary form,
-           as expected to be saved in a database.
-
-        :returns: a list of corresponding `Trial` objects.
-        """
         db = Database()
         config = db.read(cls.trial_immutable_collection, {'_id': trial_id})
         if not config:
@@ -396,6 +389,9 @@ class Trial(object):
 
     def switchover(self):
         self._set_status('switchover', self.switchover_stati)
+
+    def failover(self):
+        self._set_status('failover', ['running'])
 
     def heartbeat(self):
         self._set_status(
