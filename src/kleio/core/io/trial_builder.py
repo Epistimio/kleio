@@ -275,6 +275,8 @@ class TrialBuilder(object):
             experiment view object.
         """
         local_config = self.fetch_full_config(cmdargs)
+        if 'version' not in local_config:
+            raise RuntimeError("Cannot infer script version based on commandline")
 
         return self.build_view_from_config(local_config)
 
