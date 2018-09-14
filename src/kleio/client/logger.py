@@ -73,7 +73,7 @@ class AnalyzeLogger(Logger):
         self.trial.add_artifact(filename, artifact, **attributes)
 
     def load_config(self):
-        return self.trial.configuration
+        return self.trial.configurations
 
     def load_statistic(self, query):
         raise NotImplementedError()
