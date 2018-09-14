@@ -613,6 +613,7 @@ class Trial(object):
             'registry': {
                 'status': self.status,
                 'start_time': self.start_time,
+                'end_time': self.end_time
             }
             # statisticts?
             # artifacts?
