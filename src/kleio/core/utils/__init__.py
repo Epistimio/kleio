@@ -195,7 +195,7 @@ class SortedDict(dict):
         return "{{{}}}".format(", ".join("{}: {}".format(k, v) for k, v in self.items()))
 
 
-def flatten(dictionary):
+def flatten(dictionary, returncopy=True):
     def _flatten(dictionary):
         if dictionary == {}:
             return dictionary
@@ -215,7 +215,10 @@ def flatten(dictionary):
         new_dictionary.update(flatten(dictionary))
         return new_dictionary
 
-    return _flatten(copy.deepcopy(dictionary))
+    if returncopy:
+        return _flatten(copy.deepcopy(dictionary))
+    else:
+        return _flatten(dictionary)
 
 
 def unflatten(dictionary):
