@@ -66,7 +66,14 @@ def main(args):
 
     branch_original = args.pop("branch_original", False)
 
-    trial = trial_builder.build_view_from(args)
+    try:
+        trial = trial_builder.build_view_from(args)
+    except RuntimeError as e:
+        if "Cannot infer script version" in str(e):
+            raise SystemExit("Cannot infer script version based on "
+                             "commandline:\n{}".format(" ".join(args['commandline'])))
+
+        raise
 
     if trial is not None and branch_original:
         if not tags:
