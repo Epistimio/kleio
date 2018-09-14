@@ -82,13 +82,23 @@ def sequential_worker(consumer, args):
         for trial in fetch_new_trials(query, trials_seen):
             new_trials = True
             try:
-                trial = process_trial(consumer, trial, host, allow_host_change, allow_version_change, config, tags)
-                # Make sure we do not fetch again branched trials
-                trials_seen.add(trial.id)
+                processed_trial = process_trial(consumer, trial, host, allow_host_change, allow_version_change, config, tags)
+            except Exception as e:
+                print("Skipping {trial.short_id} because of error:".format(trial=trial))
+                print(str(e))
+                continue
 
-                execute_trial(consumer, trial)
-            except BaseException as e:
-                print("Skipping {trial.short_id} because of error:")
+            if processed_trial is None:
+                continue
+
+            # Make sure we do not fetch again branched trials
+            trials_seen.add(processed_trial.id)
+
+            try:
+                execute_trial(consumer, processed_trial)
+            except Exception as e:
+                print(type(e))
+                print("Skipping {trial.short_id} because of error:".format(trial=processed_trial))
                 print(str(e))
 
     print("No more trials executable. Leaving...")
@@ -109,7 +119,7 @@ def process_trial(consumer, trial, host, allow_host_change, allow_version_change
     trial.update()
     try:
         trial.status
-    except AttributeError:
+    except AttributeError as e:
         print("Attribute error, now marked as broken: {}".format(trial.short_id))
         trial = TrialNode.load(trial.id)
         trial.reserve()
@@ -186,11 +196,18 @@ def execute_trial(consumer, trial):
         if not "suspended remotely by user" in str(e):
             raise SystemExit()
     except Exception as e:
-        print("Error: Trial {} is broken".format(trial.short_id))
-        print()
-        print("You can check log with the following command:")
-        print("$ kleio cat --stderr {}".format(trial.short_id))
-        print()
+        if trial.status == "broken":
+            print("Error: Trial {} is broken".format(trial.short_id))
+            print()
+            print("You can check log with the following command:")
+            print("$ kleio cat --stderr {}".format(trial.short_id))
+            print()
+        else:
+            print("Error: execution of trial {trial.short_id} failed".format(trial.short_id))
+            print("Status is now {}".format(trial.status))
+            print()
+            traceback.print_exc()
+            print()
 
 
 def unique_worker(consumer, args):

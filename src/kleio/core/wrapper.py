@@ -26,7 +26,7 @@ from kleio.core.trial.base import Trial
 log = logging.getLogger(__name__)
 
 
-def sigterm_handler(signal, frame):
+def sigterm_handler():
     if sigterm_handler.triggered:
         return
     else:
@@ -153,6 +153,7 @@ class Consumer(object):
     def _consume(self, trial, working_dir):
         print("Executing command:\n{}".format(trial.commandline))
         trial.running()
+        trial.save()
         returncode = self.launch_process(trial, working_dir)
 
         if returncode != 0:
@@ -180,12 +181,16 @@ class Consumer(object):
         log.debug("Executing with env:\n{}".format(pprint.pformat(env)))
 
         # Create the subprocess, redirect the standard output into a pipe
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
+        # loop = asyncio.new_event_loop()
+        # asyncio.set_event_loop(loop)
+
+        # loop.add_signal_handler(signal.SIGINT, ask_exit)
+        # loop.add_signal_handler(signal.SIGTERM, sys_suspend)
+
         try:
-            signal.signal(signal.SIGTERM, sigterm_handler)
-            task = execute(trial, capture=self.capture, cwd=working_dir, env=env)
-            returncode = loop.run_until_complete(task)
+            # loop.add_signal_handler(signal.SIGTERM, sigterm_handler)
+            returncode = execute(trial, capture=self.capture, cwd=working_dir, env=env)
+            # returncode = loop.run_until_complete(task)
         except kleio.core.utils.errors.SignalInterrupt as e:
             print(SIGNAL.format(trial=trial))
             trial.interrupt()
@@ -202,8 +207,15 @@ class Consumer(object):
             trial.broken()
             trial.save()
             raise e
-        finally:
-            loop.close()
+        # finally:
+        #     print('Cancelling')
+        #     for task in asyncio.Task.all_tasks():
+        #         print(task)
+        #         task.cancel()
+
+        #     print('Closing the loop')
+        #     loop.stop()
+        #     loop.close()
 
         return returncode
 
@@ -218,20 +230,31 @@ def update(trial, sleep_time=10):
         except RuntimeError as e:
             if "Trial status changed meanwhile. Heartbeat failed." in str(e):
                 trial.update()
+
+                # for task in asyncio.Task.all_tasks():
+                #     task.cancel()
+
                 if trial.status == "suspended":
+
                     raise KeyboardInterrupt(
                         "Trial {trial.short_id} suspended remotely by user.".format(trial=trial))
             raise
         except concurrent.futures.CancelledError:
-            raise
+            print("update cancelled")
+            break
         finally:
             trial.save()
+
+    print("Exiting update")
 
 
 @asyncio.coroutine
 def log_stream(stdlist, stream, capture):
     while not stream.at_eof():
-        data = yield from stream.readline()
+        try:
+            data = yield from stream.readline()
+        except concurrent.futures.CancelledError:
+            break
         if data:
             line = data.decode('ascii').rstrip()
             stdlist.append(line)
@@ -239,28 +262,47 @@ def log_stream(stdlist, stream, capture):
                 print(line)
 
 
-@asyncio.coroutine 
 def execute(trial, cwd, env, capture=False, sleep_time=10):
-    """
-    A task to do for a number of seconds
-    """
+
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+
+    loop.add_signal_handler(signal.SIGINT, ask_exit)
+    loop.add_signal_handler(signal.SIGTERM, sigterm_handler)
     # To make sure we have no discrepency between std{out,err} and logged data from clients process
     env['PYTHONUNBUFFERED'] = '1'
-    create = asyncio.create_subprocess_exec(*trial.commandline.split(" "),
-                                            stdout=asyncio.subprocess.PIPE,
-                                            stderr=asyncio.subprocess.PIPE,
-                                            env=env,
-                                            cwd=cwd)
-    proc = yield from create
 
-    tasks = [asyncio.async(log_stream(trial._stdout, proc.stdout, capture)),
-             asyncio.async(log_stream(trial._stderr, proc.stderr, capture)),
-             asyncio.async(proc.wait())]
+    update_task = asyncio.ensure_future(update(trial, sleep_time=sleep_time), loop=loop)
 
-    update_task = asyncio.async(update(trial, sleep_time=sleep_time))
+    try:
+        returncode = loop.run_until_complete(
+            subprocess(trial.commandline.split(" "), stdout=trial._stdout, stderr=trial._stderr, env=env, cwd=cwd, capture=capture))
+    finally:
+        update_task.cancel()
+        loop.run_until_complete(update_task)
+        loop.close()
 
-    yield from asyncio.wait(tasks)
+    return returncode
 
-    update_task.cancel()
 
-    return proc.returncode
+async def subprocess(cmdline, stdout, stderr, cwd, env, capture=False):
+
+   process = await asyncio.create_subprocess_exec(
+        *cmdline, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE, cwd=cwd, env=env)
+
+   await asyncio.wait(
+       [log_stream(stdout, process.stdout, capture),
+        log_stream(stderr, process.stderr, capture)])
+
+   return await process.wait()
+
+
+
+
+def ask_exit():
+    # for task in asyncio.Task.all_tasks():
+    #     task.cancel()
+
+    # print("canceled tasks")
+    raise KeyboardInterrupt()
+    # asyncio.ensure_future(exit())
