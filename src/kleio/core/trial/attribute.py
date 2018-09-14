@@ -273,6 +273,7 @@ class EventBasedFileAttributeWithDB(EventBasedAttributeWithDB):
         self.register_event(self.ADD, attributes, timestamp=timestamp, creator=creator)
 
     def get(self, filename, query):
+        query = copy.deepcopy(query)
         query['trial_id'] = self._trial_id
         lower_bound, upper_bound = self._interval
 
