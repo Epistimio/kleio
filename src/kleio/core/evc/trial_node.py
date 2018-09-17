@@ -230,6 +230,16 @@ class TrialNode(TreeNode):
         return unflatten(diff)
 
     @property
+    def configuration(self):
+        configuration = flatten(self._get_event_based_diff_configuration())
+        for key, value in list(configuration.items()):
+            if isinstance(value, EventBasedItemAttribute):
+                events = sorted([(event['runtime_timestamp'], event['item']) for event in value])
+                configuration[key] = events[-1][1]
+
+        return unflatten(configuration)
+
+    @property
     def configurations(self):
         configuration = flatten(self._get_event_based_diff_configuration())
         for key, value in list(configuration.items()):
