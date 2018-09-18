@@ -191,6 +191,9 @@ class SortedDict(dict):
     def __eq__(self, other):
         return str(self) == str(other)
 
+    def __repr__(self):
+        return str(self)
+
     def __str__(self):
         return "{{{}}}".format(", ".join("{}: {}".format(k, v) for k, v in self.items()))
 
