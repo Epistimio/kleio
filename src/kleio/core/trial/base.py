@@ -756,7 +756,7 @@ class TrialView(object):
     __slots__ = ('_trial', )
 
     #                   Attributes
-    valid_attributes = ([] +
+    valid_attributes = (['trial_immutable_collection', 'trial_report_collection'] +
                         # Properties
                         ["id", "short_id", "tags", "status", "refers", "host", "version",
                          "commandline", "configuration", "stdout", "stderr", "interval",
