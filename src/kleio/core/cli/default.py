@@ -162,26 +162,29 @@ def process_trial(consumer, trial, host, allow_host_change, allow_version_change
         if trial.host != host:
             print("Branching {} because of different host".format(trial.short_id))
 
+        parent_node = TrialNode.load(trial.id)
+        # Force set parent node's status to branched to avoid reselecting it in the future with
+        # empty run command (sequential worker)
+        # brand_new = parent_node.status == 'new'
         try:
-            parent_node = TrialNode.load(trial.id)
-            # Force set parent node's status to branched to avoid reselecting it in the future with
-            # empty run command (sequential worker)
-            # brand_new = parent_node.status == 'new'
             parent_node.item.branch()
-            parent_node.save()
-            config['version'] = version
-            # if branch_new:
-            #     timestamp=parent_node.start_time
-            # else:
-            #     timestamp=parent_node.end_time
+        except DuplicateKeyError as e:
+            print("Skipping {}; already branched".format(trial.short_id))
+            return
+
+        parent_node.save()
+        config['version'] = version
+
+        try:
             trial = TrialBuilder().branch_leaf(parent_node, timestamp=None, **config)
-            for tag in tags:
-                if tag not in trial._tags.get():
-                    trial._tags.append(tag)
-            trial.save()
         except kleio.core.utils.errors.RaceCondition as e:
             print("Skipping {}; branch already exist".format(trial.short_id))
             return
+
+        for tag in tags:
+            if tag not in trial._tags.get():
+                trial._tags.append(tag)
+        trial.save()
     else:
         trial = TrialNode.load(trial.id)
 
