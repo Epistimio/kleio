@@ -204,6 +204,8 @@ class Trial(object):
 
         config[0].pop('_id')
         trial = cls(interval=interval, **config[0])
+        if trial.id != trial_id:
+            print("Oups, wrong id")
         trial._saved = True
         trial.update()  # Update the attributes
 
