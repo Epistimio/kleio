@@ -181,7 +181,7 @@ def process_trial(consumer, trial, host, allow_host_change, allow_version_change
             print("Skipping {}; branch already exist".format(trial.short_id))
             return
 
-        for tag in tags:
+        for tag in parent_node.tags:
             if tag not in trial._tags.get():
                 trial._tags.append(tag)
         trial.save()
