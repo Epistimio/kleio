@@ -98,6 +98,12 @@ class TrialNode(TreeNode):
         super(TrialNode, self).__init__(trial, parent, children)
 
     def __getattr__(self, name):
+        try:
+            value = TreeNode.__getattribute__(self, name)
+            return value
+        except:
+            pass
+
         item = TreeNode.__getattribute__(self, 'item')
         if hasattr(item, name):
             return getattr(item, name)
@@ -151,7 +157,7 @@ class TrialNode(TreeNode):
         """
         if not self._children and self._no_children_lookup:
             self._no_children_lookup = False
-            query = {'refers.parent_id': self.item.id}
+            query = {'refers.parent_id': self.id}
             selection = {'_id': 1}
             trials = Database().read(self.item.trial_immutable_collection,
                                      query, selection=selection)
