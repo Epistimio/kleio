@@ -329,10 +329,12 @@ class Trial(object):
 
     trial_immutable_collection = 'trials.immutables'
     trial_report_collection = 'trials.reports'
+    db_is_setup = False
 
     def __init__(self, commandline, configuration, version, refers, host, interval=(None, None)):
         """See attributes of `Trial` for meaning and possible arguments for `kwargs`."""
         self._db = Database()
+        self._setup_db()
         self._saved = False
         # TODO: kleio.config.DEFAULT_PROJECT
         self._refers = sorteddict(refers)
@@ -354,6 +356,22 @@ class Trial(object):
         # TODO: No need for that, we can infer frequency by looking at the frequency, only local
         # definition is required for running trial. Hum, what if there is only a single running
         # saved? We cannot infer? Then what?
+
+    def _setup_db(self):
+        if not Trial.db_is_setup:
+            try:
+                self._db.ensure_index(
+                    self.trial_report_collection,
+                    [('tags', Database.ASCENDING),
+                     ('registry.status', Database.ASCENDING)])
+                self._db.ensure_index(self.trial_report_collection, 'registry.status')
+                self._db.ensure_index(self.trial_report_collection, 'registry.start_time')
+                self._db.ensure_index(self.trial_report_collection, 'registry.end_time')
+            except BaseException as e:
+                if not "not authorized on" in str(e):
+                    raise
+
+            Trial.db_is_setup = True
 
     # Use immutable collection for race conditions on id registration
     # Use report collection for race conditions on status changes

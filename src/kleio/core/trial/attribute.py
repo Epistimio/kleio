@@ -118,7 +118,7 @@ class EventBasedAttributeWithDB(EventBasedAttribute):
         }
     }
     """
-    db_is_setup = False
+    indexes_built = set()
 
     def __init__(self, trial_id, name, interval=(None, None)):
         # NOTE: If interval is defined, than the attribute cannot write any new event
@@ -131,7 +131,7 @@ class EventBasedAttributeWithDB(EventBasedAttribute):
         self._setup_db()
 
     def _setup_db(self):
-        if not EventBasedAttributeWithDB.db_is_setup:
+        if self.collection_name not in EventBasedAttributeWithDB.indexes_built:
             try:
                 self._db.ensure_index(self.collection_name, 'trial_id')
                 self._db.ensure_index(self.collection_name, 'runtime_timestamp')
@@ -140,7 +140,7 @@ class EventBasedAttributeWithDB(EventBasedAttribute):
                 if not "not authorized on" in str(e):
                     raise
 
-            EventBasedAttributeWithDB.db_is_setup = True
+            EventBasedAttributeWithDB.indexes_built.add(self.collection_name)
 
     @property
     def collection_name(self):
@@ -223,7 +223,7 @@ class EventBasedFileAttributeWithDB(EventBasedAttributeWithDB):
     db_is_setup = False
 
     def _setup_db(self):
-        if not EventBasedFileAttributeWithDB.db_is_setup:
+        if self.collection_name not in EventBasedAttributeWithDB.indexes_built:
             try:
                 self._db.ensure_index(self.collection_name + ".metadata", 'trial_id')
                 self._db.ensure_index(self.collection_name + ".metadata", 'filename')
@@ -233,7 +233,7 @@ class EventBasedFileAttributeWithDB(EventBasedAttributeWithDB):
                 if not "not authorized on" in str(e):
                     raise
 
-            EventBasedFileAttributeWithDB.db_is_setup = True
+            EventBasedAttributeWithDB.indexes_built.add(self.collection_name)
 
     def replay(self):
         items = []
