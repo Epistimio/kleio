@@ -150,7 +150,6 @@ class SingletonFactory(AbstractSingletonType, Factory):
     pass
 
 
-
 def sorteddict(*items):
     if len(items) == 0:
         return SortedDict()
@@ -176,6 +175,16 @@ def _sorteddict(item):
 
 
 class SortedDict(dict):
+    def raw(self):
+        raw_dict = {}
+        for key, value in self.items():
+            if isinstance(value, SortedDict):
+                value = value.raw()
+
+            raw_dict[key] = value
+
+        return raw_dict
+
     def keys(self):
         return sorted(super(SortedDict, self).keys())
 
