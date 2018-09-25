@@ -146,6 +146,13 @@ class EventBasedAttributeWithDB(EventBasedAttribute):
     def collection_name(self):
         return "{}".format(self.name)
 
+    @property
+    def last_id(self):
+        if not self.history:
+            return 0
+
+        return int(self.history[-1]['_id'].split(".")[-1])
+
     def load(self):
         query = {"trial_id": self._trial_id}
         lower_bound, upper_bound = self._interval
@@ -168,13 +175,21 @@ class EventBasedAttributeWithDB(EventBasedAttribute):
             new_events = [event for event
                           in new_events if event['runtime_timestamp'] <= upper_bound]
 
-        self.history += new_events
+        self.history += self._filter_duplicates(new_events)
 
         return self
 
+    def _filter_duplicates(self, new_events):
+        if not self.history:
+            return new_events
+
+        last_id = self.last_id
+
+        return [e for e in new_events if int(e['_id'].split(".")[-1]) > last_id]
+
     def _save(self, event):
         # Make sure we have full history
-        event['_id'] = "{}.{}".format(self._trial_id, len(self.history) + 1)
+        event['_id'] = "{}.{}".format(self._trial_id, self.last_id + 1)
         self._db.write(self.collection_name, event)
 
     def register_event(self, event_type, item, timestamp=None, creator=None):
@@ -258,7 +273,7 @@ class EventBasedFileAttributeWithDB(EventBasedAttributeWithDB):
 
     def _save(self, event, file_like_object):
         # Make sure we have full history
-        event['_id'] = "{}.{}".format(self._trial_id, len(self.history) + 1)
+        event['_id'] = "{}.{}".format(self._trial_id, self.last_id + 1)
         metadata = copy.deepcopy(event['item'])
         event.pop('item')
         metadata.update(event)
