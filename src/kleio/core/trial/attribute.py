@@ -59,7 +59,7 @@ def unfold_event_based_diff(diff):
         if isinstance(value, dict):
             value = unfold_event_based_diff(value)
         elif isinstance(value, EventBasedItemAttribute) and len(value.history) > 0:
-            value = value.history[0]['item']
+            value = [event['item'] for event in value.history]
 
         unfolded_diff[key] = value
 
