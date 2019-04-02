@@ -107,7 +107,7 @@ twice concurrently will raise an error.
 
 .. code:: bash
 
-    $ kleio run <some-id-string>
+    $ kleio exec <some-id-string>
     > TODO: Error message
 
 To allow resuming execution even though the code or the system changed, you
