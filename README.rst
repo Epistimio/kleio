@@ -127,7 +127,7 @@ or
 
 .. code:: bash
 
-    $ kleio run --allow-any-change <some-id-string>
+    $ kleio exec --allow-any-change <some-id-string>
 
 Logging
 -------
