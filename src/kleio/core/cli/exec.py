@@ -33,6 +33,6 @@ def main(args):
     args['id'] = get_trial_from_short_id(args, args.pop('id'))['_id']
     trial = TrialBuilder().build_from_id(args)
     try:
-        Consumer(root_working_dir, capture, debug).consume(trial)
+        Consumer(root_working_dir, capture).consume(trial)
     except KeyboardInterrupt as e:
         raise SystemExit()
