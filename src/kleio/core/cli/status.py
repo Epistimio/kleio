@@ -1,6 +1,7 @@
 from collections import defaultdict
 import argparse
 import pprint
+import sys
 
 from kleio.core.io.trial_builder import TrialBuilder
 from kleio.core.trial import status
@@ -15,6 +16,14 @@ def add_subparser(parser):
     status_parser.add_argument(
         '--tags', default="",
         help=('Tags for the trials, separated with `;`'))
+
+    status_parser.add_argument(
+        '--short', action="store_true",
+        help=('Only print short status report'))
+
+    status_parser.add_argument(
+        '-a', '--all', action="store_true",
+        help=('Show all status'))
 
     status_parser.set_defaults(func=main)
 
