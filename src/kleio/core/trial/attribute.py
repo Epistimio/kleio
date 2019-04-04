@@ -59,7 +59,8 @@ def unfold_event_based_diff(diff):
         if isinstance(value, dict):
             value = unfold_event_based_diff(value)
         elif isinstance(value, EventBasedItemAttribute) and len(value.history) > 0:
-            value = value.history[0]['item']
+            # value = value.history[0]['item']
+            value = [event['item'] for event in value.history]
 
         unfolded_diff[key] = value
 
@@ -137,7 +138,7 @@ class EventBasedAttributeWithDB(EventBasedAttribute):
                 self._db.ensure_index(self.collection_name, 'runtime_timestamp')
                 self._db.ensure_index(self.collection_name, 'creation_timestamp')
             except BaseException as e:
-                if not "not authorized on" in str(e):
+                if "not authorized on" not in str(e):
                     raise
 
             EventBasedAttributeWithDB.indexes_built.add(self.collection_name)
@@ -210,7 +211,7 @@ class EventBasedListAttribute(EventBasedAttribute):
             if event['type'] == self.ADD:
                 items.append(event['item'])
             elif event['type'] == self.REMOVE:
-                del items[items.find(event['item'])]
+                del items[items.index(event['item'])]
             else:
                 raise ValueError(
                     "Invalid event type '{}', must be '{}' or '{}'".format(
@@ -244,8 +245,13 @@ class EventBasedFileAttributeWithDB(EventBasedAttributeWithDB):
                 self._db.ensure_index(self.collection_name + ".metadata", 'filename')
                 self._db.ensure_index(self.collection_name + ".metadata", 'runtime_timestamp')
                 self._db.ensure_index(self.collection_name + ".metadata", 'creation_timestamp')
+                # Because we are not using gridfs for now...
+                self._db.ensure_index(self.collection_name, 'trial_id')
+                self._db.ensure_index(self.collection_name, 'filename')
+                self._db.ensure_index(self.collection_name, 'runtime_timestamp')
+                self._db.ensure_index(self.collection_name, 'creation_timestamp')
             except BaseException as e:
-                if not "not authorized on" in str(e):
+                if "not authorized on" not in str(e):
                     raise
 
             EventBasedAttributeWithDB.indexes_built.add(self.collection_name)

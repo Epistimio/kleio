@@ -242,7 +242,7 @@ class ReadOnlyDB(object):
     def __getattr__(self, attr):
         """Get attribute only if valid"""
         if attr not in self.valid_attributes:
-            raise AttributeError("Cannot access attribute %s on view-only experiments." % attr)
+            raise AttributeError("Cannot access attribute %s on view-only database." % attr)
 
         return getattr(self._database, attr)
 

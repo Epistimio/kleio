@@ -28,7 +28,7 @@ def main(args):
     TrialBuilder().build_database(args)
     trial = TrialNode.view(get_trial_from_short_id(args, args.pop('id'))['_id'])
     print('\n'.join("{}: {}".format(timestamp, cmdline) for timestamp, cmdline in trial.commandlines))
-    print(trial.id)
+    print("ID:", trial.id)
     pprint.pprint(trial.hosts)
     pprint.pprint(trial.configuration)
     pprint.pprint(trial.status)

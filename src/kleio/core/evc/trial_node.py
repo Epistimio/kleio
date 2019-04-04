@@ -196,8 +196,10 @@ class TrialNode(TreeNode):
         if not self.parent:
             return self.item.get_artifacts(filename, query)
 
-        return chain(self.parent.get_artifacts(filename, query),
-                     self.item.get_artifacts(filename, query))
+        parent_artifacts = self.parent.get_artifacts(filename, query)
+        node_artifacts = self.item.get_artifacts(filename, query)
+
+        return chain(parent_artifacts, node_artifacts)
 
     @property
     def commandlines(self):
@@ -264,7 +266,7 @@ class TrialNode(TreeNode):
 
     @property
     def statistics(self):
-        history = self._statistics.history
+        history = list(self.item.statistics.history.values())
 
         if self.parent:
             history = list(self.parent.statistics.history.values()) + history

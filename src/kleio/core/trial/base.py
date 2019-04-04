@@ -204,8 +204,8 @@ class Trial(object):
 
         config[0].pop('_id')
         trial = cls(interval=interval, **config[0])
-        if trial.id != trial_id:
-            print("Oups, wrong id")
+        # if trial.id != trial_id:
+        #     print("Oups, wrong id")
         trial._saved = True
         trial.update()  # Update the attributes
 
@@ -702,6 +702,10 @@ class Trial(object):
         return self.id[:7]
 
     @property
+    def hash_string(self):
+        return "".join(str(getattr(self, name)) for name in self._hashable).encode('utf-8')
+
+    @property
     def hash_name(self):
         """Generate a unique name with an sha512 checksum hash for this `Trial`.
 
@@ -713,8 +717,7 @@ class Trial(object):
 
             If a trial is a branch, his hash_name is computed based on the composed configuration.
         """
-        hash_string = "".join(str(getattr(self, name)) for name in self._hashable).encode('utf-8')
-        return hashlib.sha512(hash_string).hexdigest()
+        return hashlib.sha512(self.hash_string).hexdigest()
 
     def __hash__(self):
         """Return the hashname for this trial"""

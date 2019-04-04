@@ -382,7 +382,7 @@ class TrialBuilder(object):
                                "{trial.short_id}".format(trial=trial))
 
         self._clean_config(config)
-        return self.branch_leaf(trial.id, **config)
+        return self.branch_leaf(trial, **config)
 
     def branch_leaf(self, trial, timestamp=None, **config):
         try:
@@ -391,6 +391,6 @@ class TrialBuilder(object):
             if not "Branch already exist with id" in str(e):
                 raise
 
-            trial = branch_leaf(TrialNode.load(str(e).split(" ")[-1].strip("'")), **config)
+            trial = self.branch_leaf(TrialNode.load(str(e).split(" ")[-1].strip("'")), **config)
 
         return trial
