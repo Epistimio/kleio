@@ -37,7 +37,10 @@ template = """\
 STATUS = [
     'new', 'reserved', 'running', 'completed',
     'suspended', 'interrupted', 'switchover', 'failover',
-    'broken', 'branched']
+    'broken', 'acknowledged', 'branched']
+
+
+STATUS_SUBSET = STATUS[:-1]
  
 
 def print_group(group, results):
@@ -67,11 +70,17 @@ def main(args):
     results = defaultdict(lambda : defaultdict(int))
 
     for trial in database.read(Trial.trial_report_collection, query, selection):
+        if not args['all'] and trial['registry']['status'] not in STATUS_SUBSET:
+            continue
+
         results[None][trial['registry']['status']] += 1
         results[tuple(sorted(trial['tags']))][trial['registry']['status']] += 1
 
     if len(results.keys()) > 2:
         print_group(None, results)
+
+    if args['short']:
+        sys.exit(0)
 
     results.pop(None, None)
 

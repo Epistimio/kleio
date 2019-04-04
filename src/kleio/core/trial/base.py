@@ -322,10 +322,11 @@ class Trial(object):
     # If defined, those in db should be identical.
     _immutable = ('host', 'version')
     allowed_stati = ('new', 'reserved', 'running', 'failover', 'switchover', 'suspended',
-                     'completed', 'interrupted', 'broken', 'branched')
+                     'completed', 'interrupted', 'broken', 'branched', 'acknowledged')
     reservable_stati = ('new', 'suspended', 'interrupted', 'failover', 'switchover')
     interruptable_stati = ('running', )
     switchover_stati = ('reserved', 'broken', 'branched')
+    acknowledgeable_stati = ('broken', )
 
     trial_immutable_collection = 'trials.immutables'
     trial_report_collection = 'trials.reports'
@@ -406,6 +407,9 @@ class Trial(object):
     def reserve(self):
         # TODO: If status is broken given commandline to restore
         self._set_status('reserved', self.reservable_stati)
+
+    def acknowledge(self):
+        self._set_status('acknowledged', self.acknowledgeable_stati)
 
     def switchover(self):
         self._set_status('switchover', self.switchover_stati)
